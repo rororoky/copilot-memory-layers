@@ -1,0 +1,13 @@
+---
+interface Props {
+  caption?: string;
+  reveal?: boolean;
+}
+
+const { caption, reveal = true } = Astro.props;
+---
+
+<figure class:list={['diagram', reveal && 'reveal']}>
+  <slot />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

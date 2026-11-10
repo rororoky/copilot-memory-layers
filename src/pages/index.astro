@@ -1,64 +1,76 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHead from '../components/content/PageHead.astro';
+import SourceList from '../components/content/SourceList.astro';
+import Cite from '../components/content/Cite.astro';
 import { withBase } from '../lib/url';
+import type { TocHeading } from '../lib/toc';
 
-const base = import.meta.env.BASE_URL;
-const site = Astro.site?.toString() ?? 'not configured';
+const headings: TocHeading[] = [
+  { depth: 2, slug: 'phase-2-status', text: 'Phase 2 status' },
+  { depth: 2, slug: 'try-the-preview', text: 'Try the preview' },
+  { depth: 2, slug: 'what-happens-next', text: 'What happens next' },
+];
 ---
 
 <BaseLayout
   title="Astro scaffold · Copilot Memory Layers"
-  description="Phase 1 smoke build for the Astro migration. The production site is still built by the legacy Vite pipeline."
+  description="Phase 2 preview of the build-time Astro chrome. The production site is still built by the legacy Vite pipeline."
+  page="home"
+  wide={true}
+  headings={headings}
 >
-  <main class="main" id="main">
-    <div class="main__inner prose">
-      <header class="page-head">
-        <p class="eyebrow">Phase 1 · Smoke build</p>
-        <h1>The Astro scaffold is working</h1>
-        <p>
-          This page proves that Astro, MDX, the base path, the 404 route, and the shared styles
-          build correctly. It is not the production site yet — the legacy Vite build still owns
-          <code>dist/</code>.
-        </p>
-      </header>
+  <PageHead
+    eyebrow="Phase 2 · Scaffold"
+    title="Build-time chrome is in place"
+    lede="Navigation, the table of contents, pager, footer, theme switch, citations, and source cards are now Astro components. Chapter content is still a Phase 3 job."
+  />
 
-      <div class="grid grid--2">
-        <div class="card">
-          <span class="card__kicker">Base path</span>
-          <h3><code>{base}</code></h3>
-          <p>
-            Links and assets are resolved through <code>withBase()</code>, so the same build works
-            at <code>/</code> and at a project path such as <code>/copilot-memory-layers/</code>.
-          </p>
-        </div>
-        <div class="card">
-          <span class="card__kicker">Canonical site</span>
-          <h3><code>{site}</code></h3>
-          <p>
-            The canonical origin comes from <code>SITE_URL</code> and feeds the sitemap and future
-            canonical tags.
-          </p>
-        </div>
-      </div>
-
-      <h2>What Phase 1 verifies</h2>
-      <ul>
-        <li>Astro builds a static page and a static <code>404.html</code>.</li>
-        <li>Markdown and MDX support is installed for Phase 3.</li>
-        <li>Shared design tokens and base layout styles are bundled.</li>
-        <li>The legacy Vite site still builds and deploys unchanged.</li>
-      </ul>
-
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="card__kicker">Data layer</span>
+      <h3><code>src/data/</code></h3>
       <p>
-        Next: Phase 2 extracts the chrome into layouts and components, then generates chapter
-        routes from a content collection.
-      </p>
-
-      <p>
-        <a href={withBase('')}>Reload this smoke page</a>
-        ·
-        <a href={withBase('404.html')}>Preview the 404 page</a>
+        Chapters and sources are framework-neutral modules. The legacy Vite chrome imports them
+        through thin adapters, so there is still one chapter list and one citation registry.
       </p>
     </div>
-  </main>
+    <div class="card">
+      <span class="card__kicker">Chrome</span>
+      <h3><code>src/components/chrome/</code></h3>
+      <p>
+        Topbar, sidebar, TOC, pager, footer, and theme toggle render as static HTML. Only the
+        interaction script ships to the browser.
+      </p>
+    </div>
+  </div>
+
+  <h2 id="phase-2-status">Phase 2 status</h2>
+  <p>
+    The Astro scaffold now renders the full shell around every page. The temporary chapter routes
+    exist so the sidebar, top navigation, pager, and link checker can be exercised before the real
+    content moves. This is still a preview: the production deploy continues to use the legacy
+    Vite output in <code>dist/</code>.
+    <Cite id="vscode-agents" />
+  </p>
+
+  <h2 id="try-the-preview">Try the preview</h2>
+  <p>
+    These links resolve to temporary placeholder pages. Each one uses the same layout, sidebar,
+    pager, TOC, and footer that the migrated chapters will use.
+  </p>
+  <ul>
+    <li><a href={withBase('concepts/')}>Foundations</a> — first chapter, previous/next pager</li>
+    <li><a href={withBase('lifecycle/')}>Lifecycle</a> — middle chapter, both pager links</li>
+    <li><a href={withBase('sources/')}>Sources</a> — final chapter and citation cards</li>
+  </ul>
+
+  <h2 id="what-happens-next">What happens next</h2>
+  <p>
+    Phase 3 replaces the placeholder routes with MDX content from a content collection, then
+    generates navigation, counts, and landing cards from that collection. The current data modules
+    become the collection schema.
+  </p>
+
+  <SourceList ids={['vscode-agents', 'gh-copilot-memory']} />
 </BaseLayout>

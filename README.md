@@ -57,11 +57,15 @@ npm run check:links
 
 Node 22.23.4 is required (see `.nvmrc`; Astro 7 requires this minimum).
 
-### Astro migration scaffold (Phase 1)
+### Astro migration scaffold (Phase 2)
 
 The Astro scaffold builds alongside the legacy Vite site. It writes to `dist-astro/`; the
 production build still writes to `dist/`, so the live site is unchanged until the migration
 reaches cutover.
+
+Phase 2 adds the framework-neutral data layer and the build-time chrome: topbar, sidebar, TOC,
+pager, footer, theme toggle, citations, and source cards. The chapter routes are temporary
+placeholders until Phase 3 moves the real content into MDX.
 
 ```bash
 npm run dev:astro      # Astro dev server
@@ -89,17 +93,21 @@ organisation site the value resolves to `/`.
 ├── index.html                 landing page
 ├── <chapter>/index.html       one directory per chapter, clean URLs
 ├── 404.html
-├── astro.config.mjs           Astro scaffold (Phase 1, builds to dist-astro/)
+├── astro.config.mjs           Astro config (builds to dist-astro/)
 ├── src/
-│   ├── content/nav.ts         single source of truth for the IA
-│   ├── content/sources.ts     the citation registry
-│   ├── ui/chrome.ts           header, sidebar, TOC, pager, citations
-│   ├── ui/anim.ts             reveal + reduced-motion helpers
+│   ├── data/                  chapters, sources, and site metadata
+│   ├── content/nav.ts         legacy adapter over src/data
+│   ├── content/sources.ts     legacy adapter over src/data
+│   ├── components/chrome/     build-time Topbar, Sidebar, Toc, Pager, Footer
+│   ├── components/content/    PageHead, Cite, SourceList, Badge, Callout
+│   ├── layouts/               BaseLayout and ChapterLayout
+│   ├── pages/                 index, 404, and temporary chapter routes
+│   ├── scripts/chrome.ts      theme, mobile nav, TOC, and reveal behaviour
+│   ├── ui/chrome.ts           legacy runtime chrome
+│   ├── ui/anim.ts             legacy adapter over src/lib/motion
 │   ├── widgets/               the four interactive diagrams
 │   ├── styles/                tokens, base layout, widget styles
-│   ├── pages/                 Astro smoke pages (index, 404)
-│   ├── layouts/               Astro BaseLayout
-│   └── lib/url.ts             base-aware URL helper
+│   └── lib/                   url, motion, and TOC helpers
 ├── docs/upgrade-plan.md       migration design, progress, and status
 ├── AGENTS.md                  repo-level guide for AI agents
 └── .github/                   deploy workflow + real instruction files
@@ -111,7 +119,7 @@ repository are real, working examples of the instruction layer described in chap
 ## Accuracy policy
 
 - Sources are read directly from `code.visualstudio.com/docs` and `docs.github.com`.
-- Each entry in `src/content/sources.ts` records a verification date.
+- Each entry in `src/data/sources.ts` records a verification date.
 - Anything Experimental or in Preview is marked as such.
 - Unpublished internals — retrieval scoring, vote thresholds — are described only in the terms the
   documentation uses, and listed as a known limit on the sources page.

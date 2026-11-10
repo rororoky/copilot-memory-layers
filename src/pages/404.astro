@@ -1,23 +1,31 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHead from '../components/content/PageHead.astro';
 import { withBase } from '../lib/url';
 ---
 
 <BaseLayout
   title="Page not found · Copilot Memory Layers"
   description="That page is not here."
+  page="404"
+  noindex={true}
 >
-  <main class="main" id="main">
-    <div class="main__inner prose">
-      <header class="page-head">
-        <p class="eyebrow">404</p>
-        <h1>That page is not here</h1>
-        <p>The link may be out of date, or the chapter may have been renamed.</p>
-      </header>
+  <PageHead
+    eyebrow="404"
+    title="That page is not here"
+    lede="The link may be out of date, or the chapter may have been renamed."
+  />
 
-      <p>
-        <a href={withBase('')}>Return to the Astro smoke page</a>
-      </p>
-    </div>
-  </main>
+  <div class="grid grid--2">
+    <a class="card card--link" href={withBase('layers/')}>
+      <span class="card__kicker">Start over</span>
+      <h3>The six layers</h3>
+      <p>The core chapter, with the interactive layer explorer.</p>
+    </a>
+    <a class="card card--link" href={withBase('sources/')}>
+      <span class="card__kicker">Reference</span>
+      <h3>Sources and method</h3>
+      <p>Every official page this site is built from.</p>
+    </a>
+  </div>
 </BaseLayout>

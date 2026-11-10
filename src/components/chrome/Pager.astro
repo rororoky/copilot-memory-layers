@@ -1,0 +1,29 @@
+---
+import { chapterBySlug, type Chapter } from '../../data/chapters';
+import { withBase } from '../../lib/url';
+
+interface Props {
+  current?: Chapter;
+  prev?: Chapter;
+  next?: Chapter;
+}
+
+const { current, prev, next } = Astro.props;
+const isLast = current?.slug === 'sources';
+const nextChapter = next ?? (isLast ? undefined : chapterBySlug('sources'));
+---
+
+<nav class="pager" aria-label="Chapter navigation">
+  {prev ? (
+    <a href={withBase(`${prev.slug}/`)}><span>Previous</span>{prev.title}</a>
+  ) : (
+    <a href={withBase()}><span>Back to</span>Overview</a>
+  )}
+  {isLast ? (
+    <a href={withBase()}><span>Back to</span>Overview</a>
+  ) : nextChapter ? (
+    <a href={withBase(`${nextChapter.slug}/`)}><span>Next</span>{nextChapter.title}</a>
+  ) : (
+    <a href={withBase('sources/')}><span>Reference</span>Sources and method</a>
+  )}
+</nav>

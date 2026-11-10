@@ -1,0 +1,59 @@
+---
+import ChapterLayout from '../layouts/ChapterLayout.astro';
+import Cite from '../components/content/Cite.astro';
+import Badge from '../components/content/Badge.astro';
+import { chapters, type Chapter } from '../data/chapters';
+import type { TocHeading } from '../lib/toc';
+
+interface Props {
+  chapter: Chapter;
+}
+
+export function getStaticPaths() {
+  return chapters.map((chapter) => ({
+    params: { slug: chapter.slug },
+    props: { chapter },
+  }));
+}
+
+const { chapter } = Astro.props as Props;
+
+const headings: TocHeading[] = [
+  { depth: 2, slug: 'phase-2-preview', text: 'Phase 2 preview' },
+  { depth: 2, slug: 'chrome-is-build-time', text: 'Chrome is build time' },
+  { depth: 2, slug: 'what-happens-next', text: 'What happens next' },
+];
+
+const sources = ['gh-copilot-memory'];
+---
+
+<ChapterLayout chapter={chapter} chapters={chapters} headings={headings} sources={sources} noindex={true}>
+  <h2 id="phase-2-preview">Phase 2 preview</h2>
+  <p>
+    This is a temporary placeholder for <strong>{chapter.title}</strong>. The real chapter content
+    is still in the legacy HTML site and will move to MDX in Phase 3.
+  </p>
+
+  <p>
+    The shell around this placeholder is new. The top bar, sidebar, pager, table of contents,
+    footer, theme switch, and citation cards are rendered by Astro components at build time.
+    <Cite id="gh-copilot-memory" />
+  </p>
+
+  <p>
+    <Badge variant="accent">Phase 2</Badge>
+    <Badge variant="warn">Placeholder</Badge>
+  </p>
+
+  <h2 id="chrome-is-build-time">Chrome is build time</h2>
+  <p>
+    The browser receives static navigation HTML. The only client script initialises the theme
+    toggle, mobile sidebar, reveal animations, and active TOC link. There is no client-side router.
+  </p>
+
+  <h2 id="what-happens-next">What happens next</h2>
+  <p>
+    Phase 3 replaces this placeholder with the chapter's MDX content and generates routes from a
+    content collection. The layout, chrome, citations, and source cards stay as they are.
+  </p>
+</ChapterLayout>

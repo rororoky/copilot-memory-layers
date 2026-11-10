@@ -1,0 +1,17 @@
+---
+import { withBase } from '../../lib/url';
+---
+
+<footer class="site-footer" id="footer">
+  <div class="site-footer__inner">
+    <p>
+      An independent educational resource. Not affiliated with or endorsed by GitHub or Microsoft.
+      Product behaviour changes — always confirm against the linked official documentation.
+    </p>
+    <nav aria-label="Footer">
+      <a href={withBase('sources/')}>Sources</a>
+      <a href={withBase('safety/')}>Safety</a>
+      <a href={withBase('compare/')}>Decision tables</a>
+    </nav>
+  </div>
+</footer>

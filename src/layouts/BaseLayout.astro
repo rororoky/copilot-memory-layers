@@ -1,14 +1,32 @@
 ---
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/widgets.css';
+
+import Topbar from '../components/chrome/Topbar.astro';
+import Sidebar from '../components/chrome/Sidebar.astro';
+import Toc from '../components/chrome/Toc.astro';
+import Footer from '../components/chrome/Footer.astro';
 import { withBase } from '../lib/url';
+import type { TocHeading } from '../lib/toc';
 
 interface Props {
   title: string;
   description: string;
+  page?: string;
+  wide?: boolean;
+  noindex?: boolean;
+  headings?: TocHeading[];
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  page = 'home',
+  wide = false,
+  noindex = false,
+  headings = [],
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -18,6 +36,7 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#070a0f" />
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
     <script is:inline>
@@ -30,8 +49,26 @@ const { title, description } = Astro.props;
       }
     </script>
   </head>
-  <body>
+  <body data-page={page}>
     <a class="skip-link" href="#main">Skip to content</a>
-    <slot />
+
+    <Topbar current={page} />
+
+    <div class="shell">
+      <Sidebar current={page} />
+      <main class:list={['main', wide && 'main--wide']} id="main">
+        <div class="main__inner prose">
+          <slot />
+        </div>
+      </main>
+      <Toc headings={headings} />
+    </div>
+
+    <Footer />
+
+    <script>
+      import { initChrome } from '../scripts/chrome';
+      initChrome();
+    </script>
   </body>
 </html>

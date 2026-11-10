@@ -1,0 +1,83 @@
+---
+import { chapters, topNavSlugs, type Chapter } from '../../data/chapters';
+import { withBase } from '../../lib/url';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  current?: string;
+}
+
+const { current = 'home' } = Astro.props;
+const topChapters: Chapter[] = topNavSlugs.flatMap((slug) => {
+  const chapter = chapters.find((item) => item.slug === slug);
+  return chapter ? [chapter] : [];
+});
+---
+
+<header class="topbar" id="topbar">
+  <div class="topbar__inner">
+    <button
+      class="icon-btn nav-toggle"
+      id="nav-toggle"
+      type="button"
+      aria-label="Open chapter navigation"
+      aria-expanded="false"
+      aria-controls="sidebar"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M4 7h16M4 12h16M4 17h16"></path>
+      </svg>
+    </button>
+
+    <a class="brand" href={withBase()}>
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="4.5" width="26" height="4.6" rx="2.3" fill="#a78bfa"></rect>
+        <rect x="3" y="11.2" width="26" height="4.6" rx="2.3" fill="#2dd4bf"></rect>
+        <rect x="3" y="17.9" width="26" height="4.6" rx="2.3" fill="#fbbf24"></rect>
+        <rect x="3" y="24.6" width="26" height="4.6" rx="2.3" fill="#60a5fa"></rect>
+      </svg>
+      <span class="brand__title">Copilot <span>Memory Layers</span></span>
+    </a>
+
+    <nav class="topnav" aria-label="Primary">
+      <a href={withBase()} aria-current={current === 'home' ? 'page' : undefined}>Overview</a>
+      {topChapters.map((chapter) => (
+        <a
+          href={withBase(`${chapter.slug}/`)}
+          aria-current={current === chapter.slug ? 'page' : undefined}
+        >
+          {chapter.nav}
+        </a>
+      ))}
+    </nav>
+
+    <div class="topbar__actions">
+      <a
+        class="icon-btn"
+        href={withBase('sources/')}
+        aria-label="Official sources"
+        title="Official sources"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5V5.5Z"></path>
+          <path d="M19 18v3H6.5A2.5 2.5 0 0 1 4 18.5"></path>
+        </svg>
+      </a>
+      <ThemeToggle />
+    </div>
+  </div>
+</header>

@@ -1,0 +1,18 @@
+---
+import { getSource, sourceIndex } from '../../data/sources';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const source = getSource(id);
+const index = sourceIndex(id);
+---
+
+<a
+  class="cite"
+  href={`#src-${id}`}
+  aria-label={`Source ${index}: ${source.title}`}
+  title={`${source.title} — ${source.publisher}`}
+>{index}</a>

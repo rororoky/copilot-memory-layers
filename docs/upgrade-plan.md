@@ -1,7 +1,7 @@
 ---
 title: Astro upgrade plan for copilot-memory-layers
 scope: repository
-status: phase-1-complete
+status: phase-2-complete
 created: 2026-11-10
 updated: 2026-11-10
 owner: tommy
@@ -34,8 +34,31 @@ owner: tommy
 - Verified locally with both base paths: `astro check` reports 0 errors, the Astro link check
   passes, and the legacy build/link check still pass.
 
-**Not done yet:** content migration, layout/chrome extraction, widget wrappers, landing
-generation, and the production deploy switch. Those remain Phase 2+.
+**Not done yet:** content migration, widget wrappers, landing generation, and the production
+deploy switch. Those remain Phase 3+.
+
+### 2026-11-10 — Phase 2 complete
+
+- Moved shared data to `src/data/`:
+  `chapters.ts`, `sources.ts`, and `site.ts`. The legacy modules re-export this data so the
+  Vite site and the Astro scaffold still read from one source.
+- Moved motion helpers to `src/lib/motion.ts` and TOC grouping to `src/lib/toc.ts`.
+- Added build-time chrome components:
+  `Topbar`, `Sidebar`, `Toc`, `Pager`, `Footer`, and `ThemeToggle`.
+- Added shared content components:
+  `PageHead`, `Cite`, `SourceList`, `Badge`, and `Callout`.
+- Added `BaseLayout` (head, theme boot, shell, chrome, client initialiser) and
+  `ChapterLayout` (page head, slot, bibliography, pager).
+- Added `src/scripts/chrome.ts` for theme toggling, mobile sidebar, active TOC links, and
+  reveal animations. No client-side router was added.
+- Added temporary `src/pages/[...slug].astro` placeholders for all ten chapters so navigation,
+  pager, TOC, citations, and link checking can be exercised before content migration.
+- Extended `scripts/check-links.mjs` to validate same-page anchors as well as file targets.
+- Verified with `BASE_PATH=/` and `BASE_PATH=/copilot-memory-layers`: 12 Astro pages, 0 check
+  errors, and no broken links. The legacy build and link check still pass.
+
+**Not done yet:** MDX content collection, real chapter bodies, widget wrappers, generated
+landing cards, SEO additions, and the production deploy switch. Those remain Phase 3+.
 
 ### Version decisions
 
@@ -441,7 +464,7 @@ Add a CI matrix that builds and link-checks both `BASE_PATH=/` and
 | --- | --- | --- | --- |
 | **0. Baseline** | Screenshot every page in light/dark and mobile/desktop; record current links; create a branch | Parity reference | 0.5 day |
 | **1. Scaffold** | Add Astro, MDX, sitemap; configure `base`, `site`, 404; deploy a one-page smoke build | GitHub Pages still works | **Complete** |
-| **2. Layouts + data** | Build `BaseLayout`, `ChapterLayout`, chrome components, `chapters.ts`, `sources.ts`, URL helper | Chrome generated at build time | 1–1.5 days |
+| **2. Layouts + data** | Build `BaseLayout`, `ChapterLayout`, chrome components, `chapters.ts`, `sources.ts`, URL helper | Chrome generated at build time | **Complete** |
 | **3. Content conversion** | Convert chapters to MDX one at a time, starting with `sources`, `safety`, `compare`, then widget-heavy pages | All prose in collections | 2–3 days |
 | **4. Widgets** | Wrap each vanilla widget in an `.astro` component; verify keyboard, live regions, reduced motion | Feature parity | 0.5–1 day |
 | **5. Landing/SEO** | Generate landing cards/counts; add sitemap, canonical, OG, JSON-LD; optional Pagefind search | Complete static site | 1 day |
@@ -503,6 +526,7 @@ The upgrade is successful when:
 
 ## 12. Next step
 
-Start with **Phase 1 only**: scaffold Astro, deploy a single page to GitHub Pages with the
-correct `base`, and prove the deployment path. Then migrate layouts and content incrementally.
-This keeps the current site deployable while the new one is built.
+Phases 1–2 are complete. Next is **Phase 3**: create the chapter content collection and migrate
+one chapter at a time to MDX, starting with `sources`, `safety`, and `compare`, then the
+widget-heavy pages. Replace `src/pages/[...slug].astro` with the collection route as each
+chapter moves. Production remains on the legacy build until Phase 6.

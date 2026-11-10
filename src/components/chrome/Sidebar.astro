@@ -1,0 +1,51 @@
+---
+import { chapters, groups } from '../../data/chapters';
+import { site } from '../../data/site';
+import { withBase } from '../../lib/url';
+
+interface Props {
+  current?: string;
+}
+
+const { current = 'home' } = Astro.props;
+---
+
+<aside class="sidebar" id="sidebar" aria-label="Chapters">
+  <div class="nav-group">
+    <ul class="nav-list">
+      <li>
+        <a href={withBase()} aria-current={current === 'home' ? 'page' : undefined}>
+          <span class="nav-list__num">00</span><span>Overview</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  {groups.map((group) => (
+    <div class="nav-group">
+      <p class="nav-group__label">{group}</p>
+      <ul class="nav-list">
+        {chapters
+          .filter((chapter) => chapter.group === group)
+          .map((chapter) => (
+            <li>
+              <a
+                href={withBase(`${chapter.slug}/`)}
+                aria-current={current === chapter.slug ? 'page' : undefined}
+              >
+                <span class="nav-list__num">{chapter.num}</span>
+                <span>{chapter.nav}</span>
+              </a>
+            </li>
+          ))}
+      </ul>
+    </div>
+  ))}
+
+  <div class="sidebar__foot">
+    <p>
+      <strong>Built from official documentation.</strong><br />
+      Every claim is cited. Last verified {site.verifiedOn}.
+    </p>
+  </div>
+</aside>

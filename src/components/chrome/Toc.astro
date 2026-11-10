@@ -1,0 +1,32 @@
+---
+import { buildToc, type TocHeading } from '../../lib/toc';
+
+interface Props {
+  headings?: TocHeading[];
+}
+
+const { headings = [] } = Astro.props;
+const items = buildToc(headings);
+---
+
+<aside class="toc" id="toc" aria-label="On this page">
+  {items.length >= 2 && (
+    <>
+      <p class="toc__label">On this page</p>
+      <ol>
+        {items.map((item) => (
+          <li>
+            <a href={`#${item.id}`}>{item.text}</a>
+            {item.sub.length > 0 && (
+              <ol class="toc__sub">
+                {item.sub.map((sub) => (
+                  <li><a href={`#${sub.id}`}>{sub.text}</a></li>
+                ))}
+              </ol>
+            )}
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+</aside>

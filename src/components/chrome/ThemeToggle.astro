@@ -1,0 +1,39 @@
+---
+/**
+ * The icon is toggled by CSS from the document theme. The client script updates
+ * the accessible label; the inline boot script in BaseLayout sets the theme
+ * before first paint.
+ */
+---
+
+<button
+  class="icon-btn"
+  id="theme-toggle"
+  type="button"
+  aria-label="Switch colour theme"
+  title="Switch colour theme"
+>
+  <svg
+    class="theme-icon theme-icon--sun"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"></path>
+  </svg>
+  <svg
+    class="theme-icon theme-icon--moon"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a7 7 0 0 0 9.9 9.9Z"></path>
+  </svg>
+</button>

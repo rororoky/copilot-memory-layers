@@ -59,8 +59,29 @@ const problems = [];
 
 for (const file of files) {
   const html = await readFile(file, 'utf8');
+  const anchors = new Set(
+    [...html.matchAll(/\bid\s*=\s*["']([^"']+)["']/gi)].map((match) => match[1]),
+  );
+
   for (const raw of extractLinks(html)) {
-    if (!raw || raw.startsWith('#')) continue;
+    if (!raw) continue;
+
+    // Same-page fragments cover the TOC and citation chips.
+    if (raw.startsWith('#')) {
+      const fragment = raw.slice(1);
+      if (!fragment) continue;
+      let id = fragment;
+      try {
+        id = decodeURIComponent(fragment);
+      } catch {
+        /* keep the raw fragment */
+      }
+      if (!anchors.has(id)) {
+        problems.push({ file: relative(DIST, file), link: raw, reason: 'missing anchor' });
+      }
+      continue;
+    }
+
     if (/^(https?:|mailto:|tel:|data:|javascript:)/i.test(raw)) continue;
 
     const withoutSuffix = raw.split('#')[0].split('?')[0];

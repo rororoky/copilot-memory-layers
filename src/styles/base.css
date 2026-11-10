@@ -186,6 +186,18 @@ a:hover {
   height: 17px;
 }
 
+.theme-icon--moon {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-icon--sun {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-icon--moon {
+  display: block;
+}
+
 .nav-toggle {
   display: inline-flex;
 }
