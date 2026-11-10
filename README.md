@@ -57,7 +57,7 @@ npm run check:links
 
 Node 22.23.4 is required (see `.nvmrc`; Astro 7 requires this minimum).
 
-### Astro migration scaffold (Phases 3–4)
+### Astro migration scaffold (Phases 3–5)
 
 The Astro site builds alongside the legacy Vite site. It writes to `dist-astro/`; the production
 build still writes to `dist/`, so the live site is unchanged until the migration reaches cutover.
@@ -65,6 +65,10 @@ build still writes to `dist/`, so the live site is unchanged until the migration
 All ten chapters now live in `src/content/chapters/<slug>/index.mdx`. Frontmatter drives the
 navigation, pager, TOC, meta description, and bibliography. The four interactive diagrams mount
 from the existing vanilla TypeScript widgets through `WidgetSection`.
+
+Phase 5 adds the collection-driven landing page, canonical URLs, Open Graph and Twitter
+metadata, `WebSite`/`Article`/`BreadcrumbList` JSON-LD, a generated `robots.txt`, a 1200×630
+social preview image, and a sitemap for every chapter.
 
 ```bash
 npm run dev:astro      # Astro dev server
@@ -118,17 +122,20 @@ organisation site the value resolves to `/`.
 ├── <chapter>/index.html       legacy chapter pages (frozen until cutover)
 ├── 404.html
 ├── astro.config.mjs           Astro config (builds to dist-astro/)
+├── public/
+│   ├── og.png                 social preview image
+│   └── og.svg                 editable source for og.png
 ├── src/
 │   ├── content.config.ts      chapter collection schema
 │   ├── content/chapters/      ten MDX chapters
-│   ├── data/                  chapters, sources, and site metadata
+│   ├── data/                  chapters, sources, site metadata, landing copy
 │   ├── content/nav.ts         legacy adapter over src/data
 │   ├── content/sources.ts     legacy adapter over src/data
 │   ├── components/chrome/     build-time Topbar, Sidebar, Toc, Pager, Footer
-│   ├── components/content/    PageHead, Cite, SourceList, Badge, Callout, Figure
+│   ├── components/content/    PageHead, ChapterCard, Cite, JsonLd, SourceList, Badge, Callout, Figure
 │   ├── components/widgets/    WidgetSection mounts the existing diagrams
 │   ├── layouts/               BaseLayout and ChapterLayout
-│   ├── pages/                 index, 404, and collection-driven chapter routes
+│   ├── pages/                 landing, 404, chapter routes, robots.txt
 │   ├── scripts/chrome.ts      theme, mobile nav, TOC, and reveal behaviour
 │   ├── ui/chrome.ts           legacy runtime chrome
 │   ├── ui/anim.ts             legacy adapter over src/lib/motion

@@ -1,0 +1,22 @@
+---
+import type { Chapter } from '../../data/chapters';
+import { cardFor } from '../../data/landing';
+import { withBase } from '../../lib/url';
+
+interface Props {
+  chapter: Chapter;
+}
+
+const { chapter } = Astro.props;
+const meta = cardFor(chapter);
+---
+
+<a class="chapter-card" href={withBase(`${chapter.slug}/`)} style={`--tone: ${chapter.tone}`}>
+  <div class="chapter-card__top">
+    <span class="chapter-card__num">{chapter.num}</span>
+    <span class="badge">{meta.badge}</span>
+  </div>
+  <h3>{chapter.title}</h3>
+  <p>{chapter.blurb}</p>
+  <span class="chapter-card__cta">{meta.cta}</span>
+</a>

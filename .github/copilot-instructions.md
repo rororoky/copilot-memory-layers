@@ -30,11 +30,14 @@ runtime**.
 
 - `src/content.config.ts` — Astro content collection schema.
 - `src/content/chapters/<slug>/index.mdx` — the ten chapters. Source of truth for new content.
-- `src/data/` — framework-neutral chapters, sources, and site metadata. The legacy manifest is
-  temporarily asserted against the collection until cutover.
+- `src/data/` — framework-neutral chapters, sources, site metadata, and landing copy. The legacy
+  manifest is temporarily asserted against the collection until cutover.
 - `src/content/nav.ts`, `src/content/sources.ts` — legacy adapters over `src/data/`.
-- `src/components/`, `src/layouts/`, `src/pages/` — Astro chrome, layouts, and collection routes.
+- `src/components/`, `src/layouts/`, `src/pages/` — Astro chrome, layouts, landing page, chapter
+  routes, and `robots.txt`.
+- `src/components/content/` — includes `ChapterCard`, `JsonLd`, and the shared prose primitives.
 - `src/components/widgets/` — `WidgetSection` mounts the existing diagrams.
+- `public/og.png`, `public/og.svg` — social preview image and source.
 - `src/ui/` — legacy site chrome, animation helpers, DOM utilities.
 - `src/widgets/` — the four interactive diagrams. Each exports a `mountX(root)` function.
 - `src/styles/` — tokens, base layout, widgets.

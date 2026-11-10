@@ -15,16 +15,16 @@ load. Every factual claim is tied to an entry in `src/data/sources.ts`.
 2. `.github/instructions/mdx.instructions.md` — rules for chapter MDX (current authoring path).
 3. `.github/instructions/docs.instructions.md` — rules for the frozen legacy HTML pages.
 4. `.github/instructions/widgets.instructions.md` — rules for interactive widgets.
-5. **`docs/upgrade-plan.md` — the Astro migration plan. Status: Phases 1–4 complete; Phase 5+ not started.**
+5. **`docs/upgrade-plan.md` — the Astro migration plan. Status: Phases 1–5 complete; Phase 6 not started.**
 
 ## Upgrade plan (durable context)
 
 The canonical plan is [`docs/upgrade-plan.md`](./docs/upgrade-plan.md). It is a repository-scoped
 decision record. Do not create a parallel plan; update that document instead.
 
-**Status:** Phases 1–4 complete (MDX content, widgets, verification), Phase 5+ not started.
+**Status:** Phases 1–5 complete (MDX content, widgets, landing, SEO), Phase 6 not started.
 **Decision owner:** tommy.
-**Created:** 2026-11-10; updated 2026-11-10.
+**Created:** 2026-11-10; updated 2026-11-11.
 
 ### Recommendation
 
@@ -70,7 +70,7 @@ that the legacy manifest matches the collection.
 | 2 | Build layouts, chrome components, chapter data, URL helper | **Complete** (2026-11-10) |
 | 3 | Convert chapters to MDX, one at a time | **Complete** (2026-11-10) |
 | 4 | Wrap the four widgets; verify keyboard/reduced-motion behavior | **Complete** (2026-11-10) |
-| 5 | Generate landing cards; add sitemap, canonical, OG, JSON-LD, optional Pagefind | Not started |
+| 5 | Generate landing cards; add sitemap, canonical, OG, JSON-LD, optional Pagefind | **Complete** (2026-11-11) |
 | 6 | Delete legacy HTML/chrome, update docs and CI | Not started |
 
 Update the status column and the canonical plan when a phase is completed.
@@ -157,9 +157,28 @@ Update the status column and the canonical plan when a phase is completed.
 - The widget script is bundled only on pages that import `WidgetSection`. It currently imports
   all four widgets together; a later optimization can split them per page.
 
+### Phase 5 notes (implemented)
+
+- Rebuilt `src/pages/index.astro` as the real landing page using collection data:
+  hero, layer teaser, fact strip, ten generated chapter cards, and reading guidance.
+- Added `ChapterCard.astro` and `src/data/landing.ts` for landing-only badge/CTA copy. New
+  chapters fall back to their group name and a generic CTA.
+- Added `JsonLd.astro` and structured data:
+  - home: `WebSite`
+  - chapters: `Article` plus `BreadcrumbList`
+- Added canonical URLs, Open Graph, and Twitter card metadata to `BaseLayout`.
+- Added `public/og.png` (1200×630) with `public/og.svg` as the editable source.
+- Added a base-aware `src/pages/robots.txt.ts` that points at `sitemap-index.xml`.
+- Confirmed `@astrojs/sitemap` outputs all chapter URLs with the correct base path.
+- Added the `prose` opt-out to `BaseLayout` so the landing page can use non-prose sections while
+  chapter pages keep the prose container.
+- Browser checks: 10 landing cards, 4 fact cards, 3 revealed sections, correct mobile layout,
+  widgets still working.
+- Pagefind search is intentionally deferred; it is optional and not needed for the static cutover.
+
 ### Guardrails for agents
 
-- **Phases 1–4 are complete; do not start Phase 5+ without explicit approval.** The current site
+- **Phases 1–5 are complete; do not start Phase 6 without explicit approval.** The current site
   must remain deployable.
 - **Read `docs/upgrade-plan.md` before changing the information architecture.**
 - **Do not replace the production build target** (`dist/`) until Phase 6. Astro currently builds
@@ -184,7 +203,7 @@ it generates static HTML and the runtime remains dependency-free. Runtime JavaSc
 the shared chrome initialiser and the existing widget modules. Do not add React/Vue/Svelte or a
 client-side router.
 
-Phases 1–4 are approved and the Astro site is content-complete, but the legacy site still owns
+Phases 1–5 are approved and the Astro site is content-complete, but the legacy site still owns
 the production artifact. Until later phases are approved:
 
 - Keep the legacy site and `dist/` deploy path working.
@@ -213,8 +232,8 @@ npm run check:links:astro
 
 - `src/content.config.ts` — Astro content collection schema.
 - `src/content/chapters/<slug>/index.mdx` — the ten migrated chapters.
-- `src/data/` — framework-neutral `chapters.ts`, `sources.ts`, and `site.ts` (legacy manifest
-  still asserted against the collection).
+- `src/data/` — framework-neutral `chapters.ts`, `sources.ts`, `site.ts`, and `landing.ts`
+  (legacy manifest still asserted against the collection).
 - `src/content/nav.ts`, `src/content/sources.ts` — legacy adapters over `src/data/`.
 - `src/ui/chrome.ts` — legacy runtime chrome.
 - `src/ui/anim.ts` — legacy adapter over `src/lib/motion.ts`.
@@ -222,10 +241,13 @@ npm run check:links:astro
 - `src/styles/` — tokens, base layout, widget styles.
 - `<chapter>/index.html` — legacy chapter pages; frozen until cutover.
 - `astro.config.mjs` — Astro config; outputs to `dist-astro/`.
-- `src/pages/` — Astro routes: `index`, `404`, and the collection-driven `[...slug]`.
-- `src/layouts/` — `BaseLayout` and `ChapterLayout`.
+- `src/pages/` — Astro routes: landing `index`, `404`, collection-driven `[...slug]`, and
+  `robots.txt`.
+- `src/layouts/` — `BaseLayout` (metadata, canonical, OG, JSON-LD) and `ChapterLayout`.
 - `src/components/chrome/` — build-time navigation and footer components.
-- `src/components/content/` — `PageHead`, `Cite`, `SourceList`, `Badge`, `Callout`, `Figure`, `TableWrap`.
+- `src/components/content/` — `PageHead`, `ChapterCard`, `Cite`, `JsonLd`, `SourceList`, `Badge`,
+  `Callout`, `Figure`, `TableWrap`.
+- `public/og.png` / `public/og.svg` — social preview image and its editable source.
 - `src/components/widgets/` — `WidgetSection`, which mounts the existing diagrams.
 - `src/scripts/chrome.ts` — client initialiser for theme, mobile nav, TOC, and reveals.
 - `src/lib/` — `chapters.ts`, `url.ts`, `motion.ts`, `toc.ts`, and the table rehype plugin.

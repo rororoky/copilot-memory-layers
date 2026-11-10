@@ -1,9 +1,9 @@
 ---
 title: Astro upgrade plan for copilot-memory-layers
 scope: repository
-status: phase-4-complete
+status: phase-5-complete
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-11
 owner: tommy
 ---
 
@@ -97,8 +97,26 @@ Those remain Phase 5+.
 - The widget script is currently imported as one bundle on widget pages. Splitting per widget is
   a future optimization, not a correctness issue.
 
-**Not done yet:** generated landing cards, SEO additions, and the production deploy switch.
-Those remain Phase 5+.
+### 2026-11-11 — Phase 5 complete
+
+- Rebuilt the landing page from the collection: hero, six-layer teaser, fact strip, ten generated
+  chapter cards, and reading guidance.
+- Added `ChapterCard.astro` and `src/data/landing.ts` for landing-only badge/CTA copy; new
+  chapters fall back to their group name and a generic CTA.
+- Added canonical URLs, Open Graph tags, and Twitter card metadata to `BaseLayout`.
+- Added `JsonLd.astro` with `WebSite` structured data on the home page and `Article` plus
+  `BreadcrumbList` on chapters.
+- Added `public/og.png` (1200×630), generated from `public/og.svg`, for social previews.
+- Added a base-aware `src/pages/robots.txt.ts` pointing at `sitemap-index.xml`.
+- Confirmed the sitemap includes every chapter and uses the correct base path for both `/` and
+  `/copilot-memory-layers/`.
+- Verified canonical, OG image, JSON-LD, robots, and sitemap URLs under both base paths.
+- Browser checks: 10 landing cards, 4 fact cards, 3 revealed sections, desktop/mobile layout, and
+  all four widgets still working.
+- Pagefind search is intentionally deferred; it is optional and not required for cutover.
+
+**Not done yet:** the production deploy switch, removal of the legacy Vite site, and final
+documentation/CI cleanup. Those remain Phase 6.
 
 ### Version decisions
 
@@ -511,7 +529,7 @@ Add a CI matrix that builds and link-checks both `BASE_PATH=/` and
 | **2. Layouts + data** | Build `BaseLayout`, `ChapterLayout`, chrome components, `chapters.ts`, `sources.ts`, URL helper | Chrome generated at build time | **Complete** |
 | **3. Content conversion** | Convert chapters to MDX one at a time, starting with `sources`, `safety`, `compare`, then widget-heavy pages | All prose in collections | **Complete** |
 | **4. Widgets** | Wrap each vanilla widget in an `.astro` component; verify keyboard, live regions, reduced motion | Feature parity | **Complete** |
-| **5. Landing/SEO** | Generate landing cards/counts; add sitemap, canonical, OG, JSON-LD; optional Pagefind search | Complete static site | 1 day |
+| **5. Landing/SEO** | Generate landing cards/counts; add sitemap, canonical, OG, JSON-LD; optional Pagefind search | Complete static site | **Complete** |
 | **6. Cutover** | Delete old HTML, `vite.config.ts`, `ui/chrome.ts`, unused `ui/anim.ts` pieces; update README and Copilot instructions | Clean codebase | 0.5 day |
 
 **Total: roughly 6–8 developer-days.** Content conversion is most of the work; the framework
@@ -570,6 +588,6 @@ The upgrade is successful when:
 
 ## 12. Next step
 
-Phases 1–4 are complete. Next is **Phase 5**: generate the real landing page and chapter cards
-from the collection, then add canonical URLs, Open Graph metadata, JSON-LD, a robots file, and
-optional Pagefind search. Production remains on the legacy build until Phase 6.
+Phases 1–5 are complete. Next is **Phase 6**: switch the GitHub Pages artifact from the legacy
+`dist/` build to Astro, remove the legacy HTML/Vite chrome, update the README and agent
+instructions for the final structure, and run the full verification suite one more time.

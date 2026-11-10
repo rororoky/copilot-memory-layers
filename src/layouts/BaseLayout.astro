@@ -7,6 +7,8 @@ import Topbar from '../components/chrome/Topbar.astro';
 import Sidebar from '../components/chrome/Sidebar.astro';
 import Toc from '../components/chrome/Toc.astro';
 import Footer from '../components/chrome/Footer.astro';
+import JsonLd from '../components/content/JsonLd.astro';
+import { site } from '../data/site';
 import { getChapters } from '../lib/chapters';
 import { withBase } from '../lib/url';
 import type { TocHeading } from '../lib/toc';
@@ -16,7 +18,11 @@ interface Props {
   description: string;
   page?: string;
   wide?: boolean;
+  prose?: boolean;
   noindex?: boolean;
+  type?: 'website' | 'article';
+  image?: string;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
   headings?: TocHeading[];
 }
 
@@ -25,11 +31,21 @@ const {
   description,
   page = 'home',
   wide = false,
+  prose = true,
   noindex = false,
+  type = 'website',
+  image = 'og.png',
+  jsonLd,
   headings = [],
 } = Astro.props;
 
 const chapters = await getChapters();
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : Astro.url.pathname;
+const ogImage = Astro.site
+  ? new URL(withBase(image), Astro.site).toString()
+  : withBase(image);
 ---
 
 <!doctype html>
@@ -39,9 +55,25 @@ const chapters = await getChapters();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#070a0f" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    {jsonLd && <JsonLd data={jsonLd} />}
     <script is:inline>
       try {
         var stored = localStorage.getItem('cml-theme');
@@ -60,7 +92,7 @@ const chapters = await getChapters();
     <div class="shell">
       <Sidebar current={page} chapters={chapters} />
       <main class:list={['main', wide && 'main--wide']} id="main">
-        <div class="main__inner prose">
+        <div class:list={['main__inner', prose && 'prose']}>
           <slot />
         </div>
       </main>

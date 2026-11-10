@@ -1,89 +1,153 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHead from '../components/content/PageHead.astro';
-import SourceList from '../components/content/SourceList.astro';
+import ChapterCard from '../components/content/ChapterCard.astro';
+import Callout from '../components/content/Callout.astro';
 import Cite from '../components/content/Cite.astro';
+import SourceList from '../components/content/SourceList.astro';
+import { sources } from '../data/sources';
+import { site } from '../data/site';
 import { getChapters } from '../lib/chapters';
 import { withBase } from '../lib/url';
 import type { TocHeading } from '../lib/toc';
 
 const chapters = await getChapters();
-const previewSlugs = ['concepts', 'lifecycle', 'sources'];
-const previews = previewSlugs.flatMap((slug) => {
-  const chapter = chapters.find((item) => item.slug === slug);
-  return chapter ? [chapter] : [];
-});
+const verified = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+}).format(new Date(site.verifiedOn));
+
+const homeUrl = Astro.site
+  ? new URL(import.meta.env.BASE_URL, Astro.site).toString()
+  : import.meta.env.BASE_URL;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.title,
+  url: homeUrl,
+  description: site.tagline,
+  inLanguage: 'en',
+};
+
+const teaserLayers = [
+  { index: 0, name: 'Model weights', life: 'permanent', tone: 'l0' },
+  { index: 1, name: 'Working memory', life: 'one chat', tone: 'l1' },
+  { index: 2, name: 'Session memory', life: 'one chat', tone: 'l2' },
+  { index: 3, name: 'Repository memory', life: 'persists', tone: 'l3' },
+  { index: 4, name: 'User memory', life: 'persists', tone: 'l4' },
+  { index: 5, name: 'Source-controlled knowledge', life: 'versioned', tone: 'l5' },
+];
 
 const headings: TocHeading[] = [
-  { depth: 2, slug: 'phase-3-status', text: 'Phase 3 status' },
-  { depth: 2, slug: 'browse-the-migrated-chapters', text: 'Browse the migrated chapters' },
-  { depth: 2, slug: 'what-happens-next', text: 'What happens next' },
+  { depth: 2, slug: 'one-minute-version', text: 'The one-minute version' },
+  { depth: 2, slug: 'read-it-in-order', text: 'Read it in order' },
+  { depth: 2, slug: 'how-to-read-this-site', text: 'How to read this site' },
 ];
 ---
 
 <BaseLayout
-  title="Astro migration · Copilot Memory Layers"
-  description="Phase 3 preview: all ten chapters now render from an Astro MDX content collection. Production is still built by the legacy Vite pipeline."
+  title="GitHub Copilot Memory Layers — an interactive guide"
+  description="An interactive, source-backed guide to how GitHub Copilot remembers things: six layers, three scopes, and the lifecycle that retires what stops being useful."
   page="home"
   wide={true}
+  prose={false}
   headings={headings}
+  jsonLd={jsonLd}
 >
-  <PageHead
-    eyebrow="Phase 3 · Migration"
-    title="All ten chapters now render from MDX"
-    lede="The chapter prose lives in one content collection. Frontmatter drives the title, navigation, pager, TOC, meta description, and bibliography; the existing interactive diagrams mount as islands."
-  />
-
-  <div class="grid grid--2">
-    <div class="card">
-      <span class="card__kicker">Content</span>
-      <h3><code>src/content/chapters/</code></h3>
-      <p>
-        Each chapter is one MDX file with validated frontmatter. Adding a chapter no longer means
-        editing a navigation manifest, a Vite input list, and a landing page.
-      </p>
+  <section class="hero">
+    <p class="hero__eyebrow">
+      <span class="badge badge--accent">Unofficial</span>
+      Built from official documentation · verified {verified}
+    </p>
+    <h1>Copilot remembers things. <em>Here is exactly what, where, and for how long.</em></h1>
+    <p class="hero__sub">
+      GitHub Copilot keeps knowledge in at least six different places, across three scopes,
+      with three completely different lifetimes. This site pulls those layers apart, cites the
+      official documentation for every claim, and lets you step through the mechanics yourself.
+    </p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href={withBase('layers/')}>Start with the six layers</a>
+      <a class="btn" href={withBase('concepts/')}>Why “memory” is ambiguous</a>
+      <a class="btn btn--ghost" href={withBase('sources/')}>Read the sources</a>
     </div>
-    <div class="card">
-      <span class="card__kicker">Rendering</span>
-      <h3><code>src/pages/[...slug].astro</code></h3>
-      <p>
-        One generated route renders every chapter. Sidebar order, previous/next links, headings,
-        and citation cards all come from the collection.
-      </p>
+
+    <div class="teaser" aria-hidden="true">
+      {teaserLayers.map((layer) => (
+        <div
+          class="teaser__row"
+          style={`--tone: var(--${layer.tone}); --i: ${layer.index}`}
+        >
+          <span class="teaser__num">{layer.index}</span>
+          <span class="teaser__bar">{layer.name}</span>
+          <span class="teaser__life">{layer.life}</span>
+        </div>
+      ))}
     </div>
-  </div>
 
-  <h2 id="phase-3-status">Phase 3 status</h2>
-  <p>
-    Ten chapters moved from hand-written HTML into MDX. Tables are wrapped at build time, citations
-    use the shared <code>Cite</code> component, figures use the shared <code>Figure</code> component,
-    and the four interactive diagrams mount from the existing vanilla TypeScript widgets.
-    <Cite id="vscode-agents" />
-  </p>
-  <p>
-    The production deploy is still the legacy Vite build in <code>dist/</code>. This Astro build is
-    the migration preview in <code>dist-astro/</code>.
-  </p>
+    <div class="hero__meta">
+      <div><strong>{chapters.length}</strong> chapters</div>
+      <div><strong>4</strong> interactive diagrams</div>
+      <div><strong>{sources.length}</strong> official sources</div>
+      <div>No tracking · No network calls</div>
+    </div>
+  </section>
 
-  <h2 id="browse-the-migrated-chapters">Browse the migrated chapters</h2>
-  <p>
-    These links come from the content collection, not a hard-coded list. Each page has the full
-    sidebar, TOC, pager, citations, and source cards.
-  </p>
-  <ul>
-    {previews.map((chapter) => (
-      <li>
-        <a href={withBase(`${chapter.slug}/`)}>{chapter.title}</a> — {chapter.blurb}
-      </li>
-    ))}
-  </ul>
+  <section class="section reveal">
+    <div class="section__head">
+      <h2 id="one-minute-version">The one-minute version</h2>
+      <p>Four numbers that explain most of the confusion.</p>
+    </div>
+    <div class="fact-strip">
+      <div class="fact">
+        <span class="fact__value">3</span>
+        <span class="fact__label">local memory scopes: session, repository, user</span>
+      </div>
+      <div class="fact">
+        <span class="fact__value">2</span>
+        <span class="fact__label">cloud scopes: repository facts and user preferences</span>
+      </div>
+      <div class="fact">
+        <span class="fact__value">90 days</span>
+        <span class="fact__label">default expiry for cloud memories that go unused</span>
+      </div>
+      <div class="fact">
+        <span class="fact__value">200 lines</span>
+        <span class="fact__label">of local user memory loaded at the start of every session</span>
+      </div>
+    </div>
+  </section>
 
-  <h2 id="what-happens-next">What happens next</h2>
-  <p>
-    Phase 4 verifies the four interactive widgets across keyboard, reduced-motion, and both colour
-    themes. Phase 5 generates the real landing cards and SEO output. Phase 6 switches production
-    from the legacy <code>dist/</code> build to Astro.
-  </p>
+  <section class="section reveal">
+    <div class="section__head">
+      <h2 id="read-it-in-order">Read it in order</h2>
+      <p>Each chapter stands alone, but the argument builds.</p>
+    </div>
+    <div class="chapter-grid" id="chapter-grid">
+      {chapters.map((chapter) => <ChapterCard chapter={chapter} />)}
+    </div>
+  </section>
 
-  <SourceList ids={['vscode-agents', 'gh-copilot-memory']} />
+  <section class="section reveal">
+    <div class="section__head">
+      <h2 id="how-to-read-this-site">How to read this site</h2>
+      <p>Small badges appear next to claims.</p>
+    </div>
+    <div class="prose">
+      <p>
+        Numbers in small boxes are citations. Each one points at an official source card at the
+        bottom of the page, so you can check the claim instead of trusting this site.
+        Anything marked <span class="badge badge--warn">Experimental</span> or
+        <span class="badge">Preview</span> can change without notice.
+      </p>
+      <Callout variant="warn" label="Not a rulebook">
+        <p>
+          Instructions and memory both guide the model. Neither one is enforcement. If a rule must
+          hold every time, it belongs in a hook, a test, or code review — not in a Markdown file.
+          <Cite id="vscode-customization" />
+        </p>
+      </Callout>
+      <SourceList ids={['vscode-customization']} />
+    </div>
+  </section>
 </BaseLayout>
