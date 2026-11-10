@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sources and method · Copilot Memory Layers</title>
+    <meta
+      name="description"
+      content="Every official page this site is built from, the date each was checked, and what this site deliberately does not claim."
+    />
+    <meta name="theme-color" content="#070a0f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      try {
+        var stored = localStorage.getItem('cml-theme');
+        if (!stored) stored = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = stored;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body data-page="sources">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar" id="topbar"></header>
+
+    <div class="shell">
+      <aside class="sidebar" id="sidebar" aria-label="Chapters"></aside>
+
+      <main class="main" id="main">
+        <div class="main__inner prose">
+          <header class="page-head">
+            <p class="eyebrow">Chapter 10 · Reference</p>
+            <h1>Sources and method</h1>
+            <p>
+              This site is a reading aid, not a primary source. Every factual statement is traceable to
+              one of these pages, and each one records the date it was read.
+            </p>
+          </header>
+
+          <h2>Method</h2>
+          <ol>
+            <li>Read the official page directly — documentation, not blog posts or summaries.</li>
+            <li>Quote the exact sentence when a claim depends on wording.</li>
+            <li>Record the verification date, because product behaviour changes.</li>
+            <li>Mark anything experimental or in preview as such.</li>
+            <li>Leave gaps visible instead of filling them with plausible guesses.</li>
+          </ol>
+
+          <h2>All sources</h2>
+          <p>
+            Seven pages, last checked on 10 November 2026. Citation numbers elsewhere on the site point
+            at these cards.
+          </p>
+
+          <div data-sources="vscode-memory, gh-copilot-memory, vscode-agents, vscode-overview, vscode-instructions, vscode-customization, vscode-prompts"></div>
+
+          <h2>What this site does not claim</h2>
+          <ul>
+            <li><strong>No internal implementation details.</strong> How retrieval is scored, how the vote threshold is set, and how contexts are trimmed are not documented publicly, so they are described here only in the terms the docs use.</li>
+            <li><strong>No promise of stability.</strong> Features labelled Experimental or Preview can change at any time.</li>
+            <li><strong>No measurement of your setup.</strong> The token counts in the context widget are illustrative, not measurements of a real request.</li>
+            <li><strong>No affiliation.</strong> This is an independent educational resource; it is not endorsed by GitHub or Microsoft.</li>
+          </ul>
+
+          <h2>Known limits of this page</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Area</th>
+                  <th>Why it is summarised rather than detailed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Plan-level defaults</td>
+                  <td>Defaults differ by plan and by surface, and change over time. Confirm in your own settings.</td>
+                </tr>
+                <tr>
+                  <td>Organisation controls</td>
+                  <td>Policy surface differs between Copilot Business and Copilot Enterprise.</td>
+                </tr>
+                <tr>
+                  <td>Harness differences</td>
+                  <td>Local, Copilot, Claude, and Codex harnesses read different customisations.</td>
+                </tr>
+                <tr>
+                  <td>Memory internals</td>
+                  <td>Voting weights, thresholds, and retrieval scoring are not published.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Corrections</h2>
+          <p>
+            If a statement here contradicts the official documentation, the documentation wins. Open an
+            issue with the page URL and the sentence that is wrong, and include the verification date so
+            the correction can be checked against the page as it stood.
+          </p>
+
+          <div class="callout callout--note">
+            <span class="callout__label">Re-verify before relying</span>
+            <p>
+              Documentation moves. If you are making a decision that depends on a detail here, open the
+              linked source and read the current version.
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+
+    <footer class="site-footer" id="footer"></footer>
+  </body>
+</html>

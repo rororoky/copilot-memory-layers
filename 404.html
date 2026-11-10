@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page not found · Copilot Memory Layers</title>
+    <meta name="description" content="That page is not here." />
+    <meta name="theme-color" content="#070a0f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      try {
+        var stored = localStorage.getItem('cml-theme');
+        if (!stored) stored = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = stored;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      // GitHub Pages serves this file for any missing path, so relative links would
+      // resolve against the broken URL. Derive the deploy root instead.
+      try {
+        var parts = location.pathname.split('/');
+        var root = parts.length > 2 ? '/' + parts[1] + '/' : '/';
+        document.querySelectorAll('a[data-root]').forEach(function (link) {
+          link.href = root + link.getAttribute('data-root');
+        });
+      } catch (e) {}
+    </script>
+  </head>
+  <body data-page="404">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar" id="topbar"></header>
+
+    <div class="shell">
+      <aside class="sidebar" id="sidebar" aria-label="Chapters"></aside>
+
+      <main class="main" id="main">
+        <div class="main__inner prose">
+          <header class="page-head">
+            <p class="eyebrow">404</p>
+            <h1>That page is not here</h1>
+            <p>The link may be out of date, or the chapter may have been renamed.</p>
+          </header>
+
+          <div class="grid grid--2">
+            <a class="card card--link" href="./layers/" data-root="layers/">
+              <span class="card__kicker">Start over</span>
+              <h3>The six layers</h3>
+              <p>The core chapter, with the interactive layer explorer.</p>
+            </a>
+            <a class="card card--link" href="./sources/" data-root="sources/">
+              <span class="card__kicker">Reference</span>
+              <h3>Sources and method</h3>
+              <p>Every official page this site is built from.</p>
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+
+    <footer class="site-footer" id="footer"></footer>
+  </body>
+</html>

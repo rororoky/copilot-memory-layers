@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Context assembly · Copilot Memory Layers</title>
+    <meta
+      name="description"
+      content="Instructions, skills, repository memory, user memory, and conversation all compete for one finite context window. Toggle each source and watch what gets dropped."
+    />
+    <meta name="theme-color" content="#070a0f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      try {
+        var stored = localStorage.getItem('cml-theme');
+        if (!stored) stored = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = stored;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body data-page="context">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar" id="topbar"></header>
+
+    <div class="shell">
+      <aside class="sidebar" id="sidebar" aria-label="Chapters"></aside>
+
+      <main class="main" id="main">
+        <div class="main__inner prose">
+          <header class="page-head">
+            <p class="eyebrow">Chapter 06 · How memory behaves</p>
+            <h1>Context assembly</h1>
+            <p>
+              Every layer described so far is, in the end, a candidate for the same small space. The
+              model never sees “memory” — it sees one assembled prompt, and something had to decide what
+              made the cut.
+            </p>
+          </header>
+
+          <h2>What competes for the window</h2>
+          <p>
+            Toggle the sources below. Pinned items are always included; the rest are subject to
+            retrieval, ordering, and — when the window is full — eviction.
+          </p>
+
+          <section class="widget reveal" aria-labelledby="context-widget-title">
+            <div class="widget__head">
+              <p class="widget__title" id="context-widget-title">Context assembly flow</p>
+              <p class="widget__hint">Switches are keyboard operable; the window updates live.</p>
+            </div>
+            <div class="widget__body" data-widget="context-flow"></div>
+          </section>
+
+          <h2>Progressive disclosure is the whole trick</h2>
+          <p>
+            Skills and task-relevant instructions are not loaded eagerly. The agent sees a name and a
+            description, decides the workflow is relevant, and only then reads the full instructions and
+            any bundled files. That keeps a large library of guidance from consuming the window before
+            anyone needs it.
+            <a class="cite" data-cite="vscode-customization"></a>
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Loaded when</th>
+                  <th>Typical cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Conversation and tool output</td><td>Always</td><td>Largest and fastest growing</td></tr>
+                <tr><td>Project instructions</td><td>Always</td><td>Fixed per turn</td></tr>
+                <tr><td>File-scoped instructions</td><td>A file matches <code>applyTo</code></td><td>Only while relevant</td></tr>
+                <tr><td>Skills</td><td>The agent decides the workflow applies</td><td>Description first, body later</td></tr>
+                <tr><td>Repository and user memory</td><td>Recalled at session start</td><td>Subset of everything stored</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Tokens are a budget, not a quota</h2>
+          <p>
+            Loaded memories count toward token usage and can affect the credits an interaction consumes.
+            A long instruction file, a large skill, and a verbose memory all compete with the actual task:
+            reading the right file, running the right command, seeing the failing test.
+            <a class="cite" data-cite="gh-copilot-memory"></a>
+          </p>
+
+          <div class="callout callout--note">
+            <span class="callout__label">Practical rule</span>
+            <p>
+              Keep always-on instructions short and specific. Move specialised procedures into skills,
+              and let memory carry the accumulated detail that would otherwise bloat a permanent file.
+            </p>
+          </div>
+
+          <h2>What this means in practice</h2>
+          <ul>
+            <li><strong>A bigger instruction file is not a better one.</strong> Precision beats volume at every layer.</li>
+            <li><strong>Retrieval is a ranking problem.</strong> Two memories can both be true and only one can be retrieved.</li>
+            <li><strong>Eviction is silent.</strong> When something is dropped to fit, the model simply proceeds without it.</li>
+            <li><strong>Subagents isolate context.</strong> Delegated work keeps intermediate noise out of the main window.</li>
+          </ul>
+
+          <div data-sources="vscode-customization, vscode-memory, gh-copilot-memory, vscode-agents"></div>
+        </div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+
+    <footer class="site-footer" id="footer"></footer>
+  </body>
+</html>

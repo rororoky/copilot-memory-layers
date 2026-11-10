@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GitHub Copilot Memory Layers — an interactive guide</title>
+    <meta
+      name="description"
+      content="An interactive, source-backed guide to how GitHub Copilot remembers things: six layers, three scopes, and the lifecycle that retires what stops being useful."
+    />
+    <meta name="theme-color" content="#070a0f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      try {
+        var stored = localStorage.getItem('cml-theme');
+        if (!stored) stored = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = stored;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body data-page="home">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="topbar" id="topbar"></header>
+
+    <div class="shell">
+      <aside class="sidebar" id="sidebar" aria-label="Chapters"></aside>
+
+      <main class="main main--wide" id="main">
+        <div class="main__inner">
+          <section class="hero">
+            <p class="hero__eyebrow">
+              <span class="badge badge--accent">Unofficial</span>
+              Built from official documentation · verified 10 Nov 2026
+            </p>
+            <h1>Copilot remembers things. <em>Here is exactly what, where, and for how long.</em></h1>
+            <p class="hero__sub">
+              GitHub Copilot keeps knowledge in at least six different places, across three scopes,
+              with three completely different lifetimes. This site pulls those layers apart, cites the
+              official documentation for every claim, and lets you step through the mechanics yourself.
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="./layers/">Start with the six layers</a>
+              <a class="btn" href="./concepts/">Why “memory” is ambiguous</a>
+              <a class="btn btn--ghost" href="./sources/">Read the sources</a>
+            </div>
+
+            <div class="teaser" aria-hidden="true">
+              <div class="teaser__row" style="--tone: var(--l0); --i: 0">
+                <span class="teaser__num">0</span>
+                <span class="teaser__bar">Model weights</span>
+                <span class="teaser__life">permanent</span>
+              </div>
+              <div class="teaser__row" style="--tone: var(--l1); --i: 1">
+                <span class="teaser__num">1</span>
+                <span class="teaser__bar">Working memory</span>
+                <span class="teaser__life">one chat</span>
+              </div>
+              <div class="teaser__row" style="--tone: var(--l2); --i: 2">
+                <span class="teaser__num">2</span>
+                <span class="teaser__bar">Session memory</span>
+                <span class="teaser__life">one chat</span>
+              </div>
+              <div class="teaser__row" style="--tone: var(--l3); --i: 3">
+                <span class="teaser__num">3</span>
+                <span class="teaser__bar">Repository memory</span>
+                <span class="teaser__life">persists</span>
+              </div>
+              <div class="teaser__row" style="--tone: var(--l4); --i: 4">
+                <span class="teaser__num">4</span>
+                <span class="teaser__bar">User memory</span>
+                <span class="teaser__life">persists</span>
+              </div>
+              <div class="teaser__row" style="--tone: var(--l5); --i: 5">
+                <span class="teaser__num">5</span>
+                <span class="teaser__bar">Source-controlled knowledge</span>
+                <span class="teaser__life">versioned</span>
+              </div>
+            </div>
+
+            <div class="hero__meta">
+              <div><strong>10</strong> chapters</div>
+              <div><strong>4</strong> interactive diagrams</div>
+              <div><strong>7</strong> official sources</div>
+              <div>No tracking · No network calls</div>
+            </div>
+          </section>
+
+          <section class="section reveal">
+            <div class="section__head">
+              <h2>The one-minute version</h2>
+              <p>Four numbers that explain most of the confusion.</p>
+            </div>
+            <div class="fact-strip">
+              <div class="fact">
+                <span class="fact__value">3</span>
+                <span class="fact__label">local memory scopes: session, repository, user</span>
+              </div>
+              <div class="fact">
+                <span class="fact__value">2</span>
+                <span class="fact__label">cloud scopes: repository facts and user preferences</span>
+              </div>
+              <div class="fact">
+                <span class="fact__value">90 days</span>
+                <span class="fact__label">default expiry for cloud memories that go unused</span>
+              </div>
+              <div class="fact">
+                <span class="fact__value">200 lines</span>
+                <span class="fact__label">of local user memory loaded at the start of every session</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="section reveal">
+            <div class="section__head">
+              <h2>Read it in order</h2>
+              <p>Each chapter stands alone, but the argument builds.</p>
+            </div>
+            <div class="chapter-grid" id="chapter-grid">
+              <a class="chapter-card" href="./concepts/" style="--tone: var(--l0)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">01</span>
+                  <span class="badge">Foundations</span>
+                </div>
+                <h3>Memory, context, and instructions</h3>
+                <p>Three different things share the word “memory”. Separating them fixes everything else.</p>
+                <span class="chapter-card__cta">Read chapter →</span>
+              </a>
+              <a class="chapter-card" href="./layers/" style="--tone: var(--l1)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">02</span>
+                  <span class="badge">Foundations</span>
+                </div>
+                <h3>The six layers</h3>
+                <p>An explorer for every layer: artifact, lifetime, scope, and how each one reaches the model.</p>
+                <span class="chapter-card__cta">Open the explorer →</span>
+              </a>
+              <a class="chapter-card" href="./local-memory/" style="--tone: var(--l2)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">03</span>
+                  <span class="badge">Scopes</span>
+                </div>
+                <h3>Local memory scopes</h3>
+                <p>What survives a new chat, a different repository, or a different developer.</p>
+                <span class="chapter-card__cta">Test the matrix →</span>
+              </a>
+              <a class="chapter-card" href="./cloud-memory/" style="--tone: var(--l3)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">04</span>
+                  <span class="badge">Cloud</span>
+                </div>
+                <h3>Cloud Copilot Memory</h3>
+                <p>Repository facts your team shares, and preferences that follow only you.</p>
+                <span class="chapter-card__cta">Read chapter →</span>
+              </a>
+              <a class="chapter-card" href="./lifecycle/" style="--tone: var(--l4)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">05</span>
+                  <span class="badge">Mechanics</span>
+                </div>
+                <h3>Memory lifecycle</h3>
+                <p>Capture, store, recall, validate, vote, expire — one memory, six stations.</p>
+                <span class="chapter-card__cta">Run the player →</span>
+              </a>
+              <a class="chapter-card" href="./context/" style="--tone: var(--accent)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">06</span>
+                  <span class="badge">Mechanics</span>
+                </div>
+                <h3>Context assembly</h3>
+                <p>Instructions, skills, memory, and conversation compete for one finite window.</p>
+                <span class="chapter-card__cta">Toggle the sources →</span>
+              </a>
+              <a class="chapter-card" href="./instructions/" style="--tone: var(--l5)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">07</span>
+                  <span class="badge">Practice</span>
+                </div>
+                <h3>The instruction layer</h3>
+                <p>Reviewed, version-controlled guidance — and why it is not the same as memory.</p>
+                <span class="chapter-card__cta">Read chapter →</span>
+              </a>
+              <a class="chapter-card" href="./compare/" style="--tone: var(--violet)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">08</span>
+                  <span class="badge">Practice</span>
+                </div>
+                <h3>Choosing the right layer</h3>
+                <p>Decision tables for every “where should this knowledge live?” question.</p>
+                <span class="chapter-card__cta">Use the tables →</span>
+              </a>
+              <a class="chapter-card" href="./safety/" style="--tone: var(--warn)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">09</span>
+                  <span class="badge">Trust</span>
+                </div>
+                <h3>Safety, trust, and retention</h3>
+                <p>What is never stored, how staleness is caught, and who controls the switches.</p>
+                <span class="chapter-card__cta">Read chapter →</span>
+              </a>
+              <a class="chapter-card" href="./sources/" style="--tone: var(--accent)">
+                <div class="chapter-card__top">
+                  <span class="chapter-card__num">10</span>
+                  <span class="badge">Reference</span>
+                </div>
+                <h3>Sources and method</h3>
+                <p>Every official page behind this site, with the date it was checked.</p>
+                <span class="chapter-card__cta">See the citations →</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="section reveal">
+            <div class="section__head">
+              <h2>How to read this site</h2>
+              <p>Small badges appear next to claims.</p>
+            </div>
+            <div class="prose">
+              <p>
+                Numbers in small boxes are citations. Each one points at an official source card at the
+                bottom of the page, so you can check the claim instead of trusting this site.
+                Anything marked <span class="badge badge--warn">Experimental</span> or
+                <span class="badge">Preview</span> can change without notice.
+              </p>
+              <div class="callout callout--warn">
+                <span class="callout__label">Not a rulebook</span>
+                <p>
+                  Instructions and memory both guide the model. Neither one is enforcement. If a rule must
+                  hold every time, it belongs in a hook, a test, or code review — not in a Markdown file.
+                  <a class="cite" data-cite="vscode-customization"></a>
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="On this page"></aside>
+    </div>
+
+    <footer class="site-footer" id="footer"></footer>
+  </body>
+</html>
