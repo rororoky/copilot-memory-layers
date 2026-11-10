@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+---
+
+<BaseLayout
+  title="Page not found · Copilot Memory Layers"
+  description="That page is not here."
+>
+  <main class="main" id="main">
+    <div class="main__inner prose">
+      <header class="page-head">
+        <p class="eyebrow">404</p>
+        <h1>That page is not here</h1>
+        <p>The link may be out of date, or the chapter may have been renamed.</p>
+      </header>
+
+      <p>
+        <a href={withBase('')}>Return to the Astro smoke page</a>
+      </p>
+    </div>
+  </main>
+</BaseLayout>

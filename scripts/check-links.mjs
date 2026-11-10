@@ -2,14 +2,16 @@
  * Internal link checker for the built site. No dependencies.
  *
  *   npm run build && npm run check:links
+ *   node scripts/check-links.mjs dist-astro
  *
- * Resolves relative and base-prefixed URLs against dist/ and reports anything
- * that would 404 on GitHub Pages.
+ * Resolves relative and base-prefixed URLs against the output directory and
+ * reports anything that would 404 on GitHub Pages. Pass the output directory as
+ * the first argument, or set DIST_DIR; the default is dist/.
  */
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 
-const DIST = resolve('dist');
+const DIST = resolve(process.argv[2] ?? process.env.DIST_DIR ?? 'dist');
 const BASE = normalizeBase(process.env.BASE_PATH ?? '/');
 
 function normalizeBase(value) {

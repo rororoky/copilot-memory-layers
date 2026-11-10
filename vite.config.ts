@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 
+const root = import.meta.dirname;
+
 /**
  * Every chapter is a real directory with its own index.html so that GitHub Pages
  * serves clean URLs and a page reload never needs a client-side router.
@@ -19,12 +21,12 @@ const chapters = [
 ];
 
 const input: Record<string, string> = {
-  home: resolve(__dirname, 'index.html'),
-  notFound: resolve(__dirname, '404.html'),
+  home: resolve(root, 'index.html'),
+  notFound: resolve(root, '404.html'),
 };
 
 for (const chapter of chapters) {
-  input[chapter] = resolve(__dirname, chapter, 'index.html');
+  input[chapter] = resolve(root, chapter, 'index.html');
 }
 
 export default defineConfig({

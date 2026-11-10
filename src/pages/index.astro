@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+
+const base = import.meta.env.BASE_URL;
+const site = Astro.site?.toString() ?? 'not configured';
+---
+
+<BaseLayout
+  title="Astro scaffold · Copilot Memory Layers"
+  description="Phase 1 smoke build for the Astro migration. The production site is still built by the legacy Vite pipeline."
+>
+  <main class="main" id="main">
+    <div class="main__inner prose">
+      <header class="page-head">
+        <p class="eyebrow">Phase 1 · Smoke build</p>
+        <h1>The Astro scaffold is working</h1>
+        <p>
+          This page proves that Astro, MDX, the base path, the 404 route, and the shared styles
+          build correctly. It is not the production site yet — the legacy Vite build still owns
+          <code>dist/</code>.
+        </p>
+      </header>
+
+      <div class="grid grid--2">
+        <div class="card">
+          <span class="card__kicker">Base path</span>
+          <h3><code>{base}</code></h3>
+          <p>
+            Links and assets are resolved through <code>withBase()</code>, so the same build works
+            at <code>/</code> and at a project path such as <code>/copilot-memory-layers/</code>.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card__kicker">Canonical site</span>
+          <h3><code>{site}</code></h3>
+          <p>
+            The canonical origin comes from <code>SITE_URL</code> and feeds the sitemap and future
+            canonical tags.
+          </p>
+        </div>
+      </div>
+
+      <h2>What Phase 1 verifies</h2>
+      <ul>
+        <li>Astro builds a static page and a static <code>404.html</code>.</li>
+        <li>Markdown and MDX support is installed for Phase 3.</li>
+        <li>Shared design tokens and base layout styles are bundled.</li>
+        <li>The legacy Vite site still builds and deploys unchanged.</li>
+      </ul>
+
+      <p>
+        Next: Phase 2 extracts the chrome into layouts and components, then generates chapter
+        routes from a content collection.
+      </p>
+
+      <p>
+        <a href={withBase('')}>Reload this smoke page</a>
+        ·
+        <a href={withBase('404.html')}>Preview the 404 page</a>
+      </p>
+    </div>
+  </main>
+</BaseLayout>

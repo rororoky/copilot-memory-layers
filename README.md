@@ -55,7 +55,24 @@ npm run preview    # serve the built site
 npm run check:links
 ```
 
-Node 22 is required (see `.nvmrc`).
+Node 22.23.4 is required (see `.nvmrc`; Astro 7 requires this minimum).
+
+### Astro migration scaffold (Phase 1)
+
+The Astro scaffold builds alongside the legacy Vite site. It writes to `dist-astro/`; the
+production build still writes to `dist/`, so the live site is unchanged until the migration
+reaches cutover.
+
+```bash
+npm run dev:astro      # Astro dev server
+npm run check:astro    # Astro + TypeScript diagnostics (Node 22.23.4+)
+npm run build:astro    # static build to dist-astro/
+npm run preview:astro  # serve dist-astro/
+npm run verify:astro   # check + build + internal link check
+npm run check:links:astro
+```
+
+The full design and phase plan live in [`docs/upgrade-plan.md`](./docs/upgrade-plan.md).
 
 ## Deploy to GitHub Pages
 
@@ -72,13 +89,19 @@ organisation site the value resolves to `/`.
 ├── index.html                 landing page
 ├── <chapter>/index.html       one directory per chapter, clean URLs
 ├── 404.html
+├── astro.config.mjs           Astro scaffold (Phase 1, builds to dist-astro/)
 ├── src/
 │   ├── content/nav.ts         single source of truth for the IA
 │   ├── content/sources.ts     the citation registry
 │   ├── ui/chrome.ts           header, sidebar, TOC, pager, citations
 │   ├── ui/anim.ts             reveal + reduced-motion helpers
 │   ├── widgets/               the four interactive diagrams
-│   └── styles/                tokens, base layout, widget styles
+│   ├── styles/                tokens, base layout, widget styles
+│   ├── pages/                 Astro smoke pages (index, 404)
+│   ├── layouts/               Astro BaseLayout
+│   └── lib/url.ts             base-aware URL helper
+├── docs/upgrade-plan.md       migration design, progress, and status
+├── AGENTS.md                  repo-level guide for AI agents
 └── .github/                   deploy workflow + real instruction files
 ```
 

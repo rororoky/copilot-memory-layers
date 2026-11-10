@@ -1,0 +1,37 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#070a0f" />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <script is:inline>
+      try {
+        var stored = localStorage.getItem('cml-theme');
+        if (!stored) stored = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = stored;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>
