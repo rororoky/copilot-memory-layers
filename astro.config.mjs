@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
+import rehypeWrapTables from './src/lib/rehype-wrap-tables.mjs';
 
 /**
  * Phase 1 scaffold.
@@ -22,5 +24,9 @@ export default defineConfig({
   outDir: './dist-astro',
   trailingSlash: 'always',
   build: { format: 'directory' },
+  markdown: {
+    syntaxHighlight: false,
+    processor: unified({ smartypants: false, rehypePlugins: [rehypeWrapTables] }),
+  },
   integrations: [mdx(), sitemap()],
 });

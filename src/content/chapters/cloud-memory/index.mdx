@@ -1,0 +1,92 @@
+---
+title: "Cloud Copilot Memory"
+nav: "Cloud memory"
+group: "How memory behaves"
+order: 4
+blurb: "Repository facts and user preferences stored by GitHub: who writes them, who can read them, and how they are cited."
+description: "Repository-level facts that your team shares and user-level preferences that follow only you — how Copilot Memory is stored, cited, and governed."
+lede: "Copilot Memory is the shared, server-side system used by Copilot CLI, the cloud agent, code review, and VS Code. It stores exactly two kinds of memory, and the difference between them is the difference between a team wiki and a personal notebook."
+tone: l3
+sources:
+  - gh-copilot-memory
+  - vscode-memory
+  - vscode-instructions
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+
+## Two types, two audiences
+
+| | Repository-level facts | User-level preferences |
+| --- | --- | --- |
+| **What they capture** | Conventions, architectural decisions, build and test commands, project rules. | Your stated preferences, approval habits, and workflows across projects. |
+| **Where they apply** | Only in operations on that repository. | Across all your repositories. |
+| **Who can see them** | Anyone with read access to the repository who can use Copilot Memory. | You. Administrators can view and export on managed plans. |
+| **Who creates them** | Users with write access to the repository. | Only you, from your own interactions. |
+| **How they are cited** | Citations pointing at the code that supports the fact. | Citations that may quote what you said. |
+
+<p class="muted">
+  Source: <a href="https://docs.github.com/en/copilot/concepts/agents/copilot-memory" target="_blank" rel="noreferrer noopener">About GitHub Copilot Memory</a>.
+  <Cite id="gh-copilot-memory" />
+</p>
+
+## How memories are created
+
+You do not write a memory. Copilot creates them as a byproduct of working with you, and chooses the type based on **who the memory applies to** — not on who happened to say it.
+
+- “This repository uses Vitest for unit tests” is true for everyone, so it becomes a repository fact.
+- “Explain your changes before you apply them” is about one person, so it becomes a user preference.
+- If the intent is ambiguous, Copilot is supposed to ask which scope you meant.
+
+You can also ask explicitly — “remember that…” — and on some surfaces Copilot will ask for approval before storing. Cloud agent and code review never ask. <Cite id="gh-copilot-memory" />
+
+## Recall is selective, by design
+
+Memories are not dumped into every prompt. Relevant repository facts and preferences are recalled when a session starts, and only a subset reaches the model. Upvoted memories are more likely to be included.
+
+<Callout variant="note" label="The consequence">
+  <p>
+    A memory can exist, be correct, and still not influence the response you are looking at.
+    This is why important rules belong in custom instructions rather than in memory.
+  </p>
+</Callout>
+
+## Where Copilot Memory is used
+
+The same service backs several surfaces, and facts learned in one can inform another.
+
+| Surface | Repository facts | User preferences |
+| --- | --- | --- |
+| Copilot CLI | Yes | Yes |
+| Copilot cloud agent | Yes | Yes |
+| Copilot code review | Yes | No |
+| Agentic Autofix | Yes | No |
+| Visual Studio Code | Yes | Yes |
+| Copilot app, mobile, Slack, Teams | Yes | Yes, where available |
+
+<p class="muted">
+  Availability depends on plan, settings, and organisation policy. Code review and autofix
+  never apply personal preferences, so a preference cannot change how your pull requests are
+  reviewed.
+</p>
+
+## The switches that matter
+
+1. **Your personal setting** on GitHub controls whether user-level preferences can be stored and used. It does not control repository facts.
+2. **Organisation or enterprise policy** can allow or restrict user preferences, and can scope repository access to all, some, or no repositories.
+3. **Repository settings** can turn off repository facts for one repository without turning off user preferences.
+4. **Your client** has its own switch — `chat.copilot.memory.enabled` in VS Code, `/memory on|off` in the CLI.
+
+All four have to allow a memory type before it is used. Turning off one does not turn off the others, which is exactly why asking “is memory on?” rarely has a single answer. <Cite id="vscode-memory" />
+
+## Cloud memory versus local memory files
+
+| | Cloud Copilot Memory | Local memory files |
+| --- | --- | --- |
+| **Stored** | On GitHub's memory service | On your machine |
+| **Scopes** | Repository and user | Session, repository, and user |
+| **Shared with team** | Repository facts are | Never |
+| **Review** | Settings pages on GitHub | Read the files directly |
+| **Expiry** | 90 days by default, reset by upvotes | No documented automatic expiry |
+| **Works in** | Many Copilot surfaces | Local harness sessions |

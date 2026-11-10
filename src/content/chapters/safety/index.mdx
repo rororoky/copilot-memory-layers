@@ -1,0 +1,120 @@
+---
+title: "Safety, trust, and retention"
+nav: "Safety and retention"
+group: "Working with it"
+order: 9
+blurb: "What is never stored, how stale facts are caught, how long memories live, and what administrators control."
+description: "What is never stored, how stale facts are caught, how long memories live, and which switches administrators control."
+lede: "A system that writes its own notes needs rules about what it may write, how it checks them, and when they disappear. All three are documented, and all three are worth knowing before you rely on memory."
+tone: warn
+sources:
+  - gh-copilot-memory
+  - vscode-memory
+  - vscode-customization
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+import Figure from '../../../components/content/Figure.astro';
+
+## What is never stored
+
+- **Detected secrets.** Tokens, keys, and credentials cause the memory to be rejected outright.
+- **Model-control tokens.** Recognised patterns are refused as a defence against prompt injection.
+- **Sensitive personal or confidential information**, by instruction to the model.
+- **Short-lived, task-specific instructions** — memory is meant for things that stay true.
+
+<p class="muted">
+  Filtering is not a substitute for hygiene. Do not paste credentials into a chat and assume a
+  filter will catch them. <Cite id="gh-copilot-memory" />
+</p>
+
+## Staleness is handled by citation, not by trust
+
+A stored fact is not treated as permanently true. Repository facts carry citations to the code that supports them, and before using one Copilot checks those citations against the current branch. That is a judgement, not a guarantee — which is why reviewed instructions remain necessary for rules.
+
+<Figure caption="Validation happens when the memory is relevant, not once at creation time.">
+  <svg viewBox="0 0 800 200" role="img" aria-label="A fact stored with citations is checked against the current branch; if the cited code no longer supports it, the memory is downvoted and a correction can replace it.">
+    <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5f76" />
+      </marker>
+    </defs>
+    <rect class="d-box" x="20" y="70" width="150" height="58" rx="10" />
+    <text class="d-label" x="95" y="94" text-anchor="middle">Stored fact</text>
+    <text class="d-sub" x="95" y="111" text-anchor="middle">+ citations</text>
+
+    <rect class="d-box d-box--accent" x="212" y="70" width="170" height="58" rx="10" />
+    <text class="d-label" x="297" y="94" text-anchor="middle">Check citations</text>
+    <text class="d-sub" x="297" y="111" text-anchor="middle">against current branch</text>
+
+    <rect class="d-box" x="424" y="16" width="150" height="52" rx="10" />
+    <text class="d-label" x="499" y="46" text-anchor="middle">Still accurate</text>
+
+    <rect class="d-box" x="424" y="124" width="150" height="52" rx="10" />
+    <text class="d-label" x="499" y="154" text-anchor="middle">Out of date</text>
+
+    <rect class="d-box" x="624" y="16" width="150" height="52" rx="10" />
+    <text class="d-label" x="699" y="46" text-anchor="middle">Upvote, reuse</text>
+
+    <rect class="d-box" x="624" y="124" width="150" height="52" rx="10" />
+    <text class="d-label" x="699" y="154" text-anchor="middle">Downvote, correct</text>
+
+    <path class="d-line" d="M 170 99 L 212 99" marker-end="url(#arrow2)" />
+    <path class="d-line" d="M 382 90 L 424 52" marker-end="url(#arrow2)" />
+    <path class="d-line" d="M 382 108 L 424 146" marker-end="url(#arrow2)" />
+    <path class="d-line" d="M 574 42 L 624 42" marker-end="url(#arrow2)" />
+    <path class="d-line" d="M 574 150 L 624 150" marker-end="url(#arrow2)" />
+  </svg>
+</Figure>
+
+## Retention and expiry
+
+| Rule | Value |
+| --- | --- |
+| Default expiry for cloud memories | 90 days without reinforcement |
+| Configurable range for repository facts | 7–180 days, set by organisation or enterprise |
+| Does retrieval reset the clock? | No — only an upvote does |
+| When several policies apply | The more restrictive value wins |
+| Asking Copilot to forget | Downvotes the memory; permanent deletion is done in GitHub settings |
+
+## Who controls what
+
+<div class="grid grid--2">
+  <div class="card">
+    <span class="card__kicker">Person</span>
+    <h3>Your settings</h3>
+    <p>Opt out of user preferences, review and delete your memories, and switch memory off per client.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">Repository admin</span>
+    <h3>Repository facts</h3>
+    <p>Turn repository memory off for one repository, and review or delete stored facts.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">Organisation</span>
+    <h3>Policy and scope</h3>
+    <p>Allow or restrict user preferences, choose which repositories may store facts, and export preferences.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">Enterprise</span>
+    <h3>Upper bounds</h3>
+    <p>Set the retention ceiling and restrict repository memory access across organisations.</p>
+  </div>
+</div>
+
+## Prompt injection and untrusted content
+
+Memory is one more channel through which text can reach a model. Content that the agent reads — a file, an issue, a web page — is untrusted input, and the defence is the same at every layer: treat retrieved text as data, review what gets committed, and keep deterministic checks outside the model.
+
+<Callout variant="warn" label="Shared means shared">
+  <p>
+    Repository facts are visible to collaborators, and the experimental
+    <code>.github/copilot-memories.jsonl</code> file can be committed like any other file.
+    Neither is a private notebook. Review before you share.
+  </p>
+</Callout>
+
+## Cost
+
+Memories included in a prompt count toward token usage and can affect the credits an interaction consumes. A large memory footprint is not free, which is another argument for keeping always-on guidance lean. <Cite id="gh-copilot-memory" />

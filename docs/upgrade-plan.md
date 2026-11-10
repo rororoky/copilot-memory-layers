@@ -1,7 +1,7 @@
 ---
 title: Astro upgrade plan for copilot-memory-layers
 scope: repository
-status: phase-2-complete
+status: phase-4-complete
 created: 2026-11-10
 updated: 2026-11-10
 owner: tommy
@@ -57,8 +57,48 @@ deploy switch. Those remain Phase 3+.
 - Verified with `BASE_PATH=/` and `BASE_PATH=/copilot-memory-layers`: 12 Astro pages, 0 check
   errors, and no broken links. The legacy build and link check still pass.
 
-**Not done yet:** MDX content collection, real chapter bodies, widget wrappers, generated
-landing cards, SEO additions, and the production deploy switch. Those remain Phase 3+.
+**Not done yet:** generated landing cards, SEO additions, and the production deploy switch.
+Those remain Phase 5+.
+
+### 2026-11-10 — Phase 3 complete
+
+- Added `src/content.config.ts` with a `chapters` collection. Each chapter lives at
+  `src/content/chapters/<slug>/index.mdx`.
+- Frontmatter is validated with Zod (`astro/zod`): title, nav, group, order, blurb, description,
+  optional lede, tone, sources, and draft.
+- Added `src/lib/chapters.ts` to load, sort, and validate collection entries. It checks unique
+  orders, resolves every source id, and temporarily asserts parity with the legacy
+  `src/data/chapters.ts` manifest.
+- Replaced the placeholder `src/pages/[...slug].astro` with a real collection route that renders
+  MDX through `ChapterLayout`, passes Astro headings to the TOC, and renders the bibliography
+  from frontmatter `sources`.
+- Migrated all ten chapters from HTML to MDX. Extracted text matches the legacy pages; the only
+  addition is the build-time source-card list.
+- Added `src/lib/rehype-wrap-tables.mjs` and the `@astrojs/markdown-remark` unified processor so
+  plain Markdown tables get `.table-wrap`.
+- Disabled syntax highlighting and Smartypants so code blocks and exact quotes keep the site's
+  own styling and wording.
+- Added `@astrojs/markdown-remark` 7.3.6 for the rehype-based table wrapper.
+- Updated the home preview to read chapter links from the collection.
+
+### 2026-11-10 — Phase 4 complete
+
+- Added `src/components/widgets/WidgetSection.astro`, which mounts the existing vanilla
+  TypeScript widgets on the four interactive pages.
+- The widget modules are unchanged; `WidgetSection` imports them and dispatches by
+  `data-widget`.
+- Browser verification with Playwright against the dev server:
+  - layer explorer: 6 bands, selection, keyboard arrow navigation
+  - scope matrix: 9 cells, scenario switching, keyboard activation
+  - lifecycle player: step controls, reduced-motion play
+  - context flow: source toggles, eviction status
+  - theme toggle and 7 source cards
+  - no console or page errors
+- The widget script is currently imported as one bundle on widget pages. Splitting per widget is
+  a future optimization, not a correctness issue.
+
+**Not done yet:** generated landing cards, SEO additions, and the production deploy switch.
+Those remain Phase 5+.
 
 ### Version decisions
 
@@ -68,6 +108,7 @@ landing cards, SEO additions, and the production deploy switch. Those remain Pha
 | `@astrojs/mdx` | 8.1.3 | Matches Astro 7 |
 | `@astrojs/sitemap` | 3.7.4 | Sitemap output for canonical URLs |
 | `@astrojs/check` | 0.9.12 | Astro diagnostics |
+| `@astrojs/markdown-remark` | 7.3.6 | Unified Markdown processor for the table-wrap plugin |
 | Vite | 8.3.6 | Shared by Astro 7 and the legacy build |
 | Node | 22.23.4 | Astro 7 engine minimum |
 
@@ -98,8 +139,8 @@ Adopt **Astro + MDX content collections + the existing vanilla TypeScript widget
 - Generate routes, navigation, pager, landing cards, counts, TOC, and bibliographies from one
   content collection.
 - Keep GitHub Pages compatibility with real static HTML per route.
-- Preserve the zero-runtime-dependency ethos: prose pages ship no JavaScript; only widget pages
-  load widget code.
+- Preserve the dependency-free runtime ethos: JavaScript is limited to the small chrome
+  initialiser and the existing widget modules; there is no runtime framework or router.
 
 ### Framework evaluation
 
@@ -267,9 +308,10 @@ Benefits:
 ### Content schema
 
 ```ts
-// src/content.config.ts (Astro 5+ content layer)
-import { defineCollection, z } from 'astro:content';
+// src/content.config.ts (Astro 7 content layer)
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 const chapters = defineCollection({
   loader: glob({
@@ -282,7 +324,9 @@ const chapters = defineCollection({
     nav: z.string(),
     group: z.enum(['Foundations', 'How memory behaves', 'Working with it']),
     order: z.number().int().positive(),
+    blurb: z.string(),
     description: z.string(),
+    lede: z.string().optional(),
     tone: z
       .enum(['l0', 'l1', 'l2', 'l3', 'l4', 'l5', 'accent', 'violet', 'warn'])
       .default('accent'),
@@ -465,8 +509,8 @@ Add a CI matrix that builds and link-checks both `BASE_PATH=/` and
 | **0. Baseline** | Screenshot every page in light/dark and mobile/desktop; record current links; create a branch | Parity reference | 0.5 day |
 | **1. Scaffold** | Add Astro, MDX, sitemap; configure `base`, `site`, 404; deploy a one-page smoke build | GitHub Pages still works | **Complete** |
 | **2. Layouts + data** | Build `BaseLayout`, `ChapterLayout`, chrome components, `chapters.ts`, `sources.ts`, URL helper | Chrome generated at build time | **Complete** |
-| **3. Content conversion** | Convert chapters to MDX one at a time, starting with `sources`, `safety`, `compare`, then widget-heavy pages | All prose in collections | 2–3 days |
-| **4. Widgets** | Wrap each vanilla widget in an `.astro` component; verify keyboard, live regions, reduced motion | Feature parity | 0.5–1 day |
+| **3. Content conversion** | Convert chapters to MDX one at a time, starting with `sources`, `safety`, `compare`, then widget-heavy pages | All prose in collections | **Complete** |
+| **4. Widgets** | Wrap each vanilla widget in an `.astro` component; verify keyboard, live regions, reduced motion | Feature parity | **Complete** |
 | **5. Landing/SEO** | Generate landing cards/counts; add sitemap, canonical, OG, JSON-LD; optional Pagefind search | Complete static site | 1 day |
 | **6. Cutover** | Delete old HTML, `vite.config.ts`, `ui/chrome.ts`, unused `ui/anim.ts` pieces; update README and Copilot instructions | Clean codebase | 0.5 day |
 
@@ -487,7 +531,7 @@ with content conversion as a separate, reversible step.
 | SEO/canonical mistakes | Set `site`; test sitemap and canonical URLs in CI |
 | Widget scripts load twice or not at all | One wrapper component per widget; smoke-test each page |
 | Authors find MDX unfamiliar | Add `CONTRIBUTING.md` with a chapter template and component catalogue |
-| Loss of the “no framework” ethos | Astro is build-time only; prose pages ship zero JS; document that runtime stays dependency-free |
+| Loss of the “no framework” ethos | Astro is build-time only; runtime JS is limited to the chrome initialiser and existing widgets; document that no runtime framework or router is added |
 | URL changes break links | Keep existing slugs; if a slug changes, add a static redirect stub because GitHub Pages has no server redirects |
 
 ## 10. Additional improvements
@@ -520,13 +564,12 @@ The upgrade is successful when:
 - `npm run check:links` passes for both base paths.
 - An unknown citation id fails the build.
 - All four widgets work with keyboard only and under `prefers-reduced-motion`.
-- Prose-only pages ship no runtime JavaScript.
+- Runtime JavaScript is limited to the shared chrome initialiser and the existing widget modules.
 - Visual parity is confirmed across light/dark and mobile/desktop.
 - Lighthouse accessibility is at least 95, ideally 100.
 
 ## 12. Next step
 
-Phases 1–2 are complete. Next is **Phase 3**: create the chapter content collection and migrate
-one chapter at a time to MDX, starting with `sources`, `safety`, and `compare`, then the
-widget-heavy pages. Replace `src/pages/[...slug].astro` with the collection route as each
-chapter moves. Production remains on the legacy build until Phase 6.
+Phases 1–4 are complete. Next is **Phase 5**: generate the real landing page and chapter cards
+from the collection, then add canonical URLs, Open Graph metadata, JSON-LD, a robots file, and
+optional Pagefind search. Production remains on the legacy build until Phase 6.

@@ -13,6 +13,7 @@ interface Props {
   headings?: TocHeading[];
   sources?: string[];
   lede?: string;
+  description?: string;
   noindex?: boolean;
 }
 
@@ -22,17 +23,23 @@ const {
   headings = [],
   sources = [],
   lede = chapter.blurb,
+  description = lede,
   noindex = false,
 } = Astro.props;
 
 const index = chapters.findIndex((item) => item.slug === chapter.slug);
 const prev = index > 0 ? chapters[index - 1] : undefined;
 const next = index >= 0 && index < chapters.length - 1 ? chapters[index + 1] : undefined;
+const nextChapter =
+  next ??
+  (chapter.slug === 'sources'
+    ? undefined
+    : chapters.find((item) => item.slug === 'sources'));
 ---
 
 <BaseLayout
   title={`${chapter.title} · ${site.title}`}
-  description={lede}
+  description={description}
   page={chapter.slug}
   headings={headings}
   noindex={noindex}
@@ -47,5 +54,5 @@ const next = index >= 0 && index < chapters.length - 1 ? chapters[index + 1] : u
 
   {sources.length > 0 && <SourceList ids={sources} />}
 
-  <Pager current={chapter} prev={prev} next={next} />
+  <Pager current={chapter} prev={prev} next={nextChapter} />
 </BaseLayout>

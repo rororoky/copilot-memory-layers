@@ -7,6 +7,7 @@ import Topbar from '../components/chrome/Topbar.astro';
 import Sidebar from '../components/chrome/Sidebar.astro';
 import Toc from '../components/chrome/Toc.astro';
 import Footer from '../components/chrome/Footer.astro';
+import { getChapters } from '../lib/chapters';
 import { withBase } from '../lib/url';
 import type { TocHeading } from '../lib/toc';
 
@@ -27,6 +28,8 @@ const {
   noindex = false,
   headings = [],
 } = Astro.props;
+
+const chapters = await getChapters();
 ---
 
 <!doctype html>
@@ -52,10 +55,10 @@ const {
   <body data-page={page}>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <Topbar current={page} />
+    <Topbar current={page} chapters={chapters} />
 
     <div class="shell">
-      <Sidebar current={page} />
+      <Sidebar current={page} chapters={chapters} />
       <main class:list={['main', wide && 'main--wide']} id="main">
         <div class="main__inner prose">
           <slot />

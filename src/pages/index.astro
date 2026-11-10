@@ -3,73 +3,86 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHead from '../components/content/PageHead.astro';
 import SourceList from '../components/content/SourceList.astro';
 import Cite from '../components/content/Cite.astro';
+import { getChapters } from '../lib/chapters';
 import { withBase } from '../lib/url';
 import type { TocHeading } from '../lib/toc';
 
+const chapters = await getChapters();
+const previewSlugs = ['concepts', 'lifecycle', 'sources'];
+const previews = previewSlugs.flatMap((slug) => {
+  const chapter = chapters.find((item) => item.slug === slug);
+  return chapter ? [chapter] : [];
+});
+
 const headings: TocHeading[] = [
-  { depth: 2, slug: 'phase-2-status', text: 'Phase 2 status' },
-  { depth: 2, slug: 'try-the-preview', text: 'Try the preview' },
+  { depth: 2, slug: 'phase-3-status', text: 'Phase 3 status' },
+  { depth: 2, slug: 'browse-the-migrated-chapters', text: 'Browse the migrated chapters' },
   { depth: 2, slug: 'what-happens-next', text: 'What happens next' },
 ];
 ---
 
 <BaseLayout
-  title="Astro scaffold · Copilot Memory Layers"
-  description="Phase 2 preview of the build-time Astro chrome. The production site is still built by the legacy Vite pipeline."
+  title="Astro migration · Copilot Memory Layers"
+  description="Phase 3 preview: all ten chapters now render from an Astro MDX content collection. Production is still built by the legacy Vite pipeline."
   page="home"
   wide={true}
   headings={headings}
 >
   <PageHead
-    eyebrow="Phase 2 · Scaffold"
-    title="Build-time chrome is in place"
-    lede="Navigation, the table of contents, pager, footer, theme switch, citations, and source cards are now Astro components. Chapter content is still a Phase 3 job."
+    eyebrow="Phase 3 · Migration"
+    title="All ten chapters now render from MDX"
+    lede="The chapter prose lives in one content collection. Frontmatter drives the title, navigation, pager, TOC, meta description, and bibliography; the existing interactive diagrams mount as islands."
   />
 
   <div class="grid grid--2">
     <div class="card">
-      <span class="card__kicker">Data layer</span>
-      <h3><code>src/data/</code></h3>
+      <span class="card__kicker">Content</span>
+      <h3><code>src/content/chapters/</code></h3>
       <p>
-        Chapters and sources are framework-neutral modules. The legacy Vite chrome imports them
-        through thin adapters, so there is still one chapter list and one citation registry.
+        Each chapter is one MDX file with validated frontmatter. Adding a chapter no longer means
+        editing a navigation manifest, a Vite input list, and a landing page.
       </p>
     </div>
     <div class="card">
-      <span class="card__kicker">Chrome</span>
-      <h3><code>src/components/chrome/</code></h3>
+      <span class="card__kicker">Rendering</span>
+      <h3><code>src/pages/[...slug].astro</code></h3>
       <p>
-        Topbar, sidebar, TOC, pager, footer, and theme toggle render as static HTML. Only the
-        interaction script ships to the browser.
+        One generated route renders every chapter. Sidebar order, previous/next links, headings,
+        and citation cards all come from the collection.
       </p>
     </div>
   </div>
 
-  <h2 id="phase-2-status">Phase 2 status</h2>
+  <h2 id="phase-3-status">Phase 3 status</h2>
   <p>
-    The Astro scaffold now renders the full shell around every page. The temporary chapter routes
-    exist so the sidebar, top navigation, pager, and link checker can be exercised before the real
-    content moves. This is still a preview: the production deploy continues to use the legacy
-    Vite output in <code>dist/</code>.
+    Ten chapters moved from hand-written HTML into MDX. Tables are wrapped at build time, citations
+    use the shared <code>Cite</code> component, figures use the shared <code>Figure</code> component,
+    and the four interactive diagrams mount from the existing vanilla TypeScript widgets.
     <Cite id="vscode-agents" />
   </p>
-
-  <h2 id="try-the-preview">Try the preview</h2>
   <p>
-    These links resolve to temporary placeholder pages. Each one uses the same layout, sidebar,
-    pager, TOC, and footer that the migrated chapters will use.
+    The production deploy is still the legacy Vite build in <code>dist/</code>. This Astro build is
+    the migration preview in <code>dist-astro/</code>.
+  </p>
+
+  <h2 id="browse-the-migrated-chapters">Browse the migrated chapters</h2>
+  <p>
+    These links come from the content collection, not a hard-coded list. Each page has the full
+    sidebar, TOC, pager, citations, and source cards.
   </p>
   <ul>
-    <li><a href={withBase('concepts/')}>Foundations</a> — first chapter, previous/next pager</li>
-    <li><a href={withBase('lifecycle/')}>Lifecycle</a> — middle chapter, both pager links</li>
-    <li><a href={withBase('sources/')}>Sources</a> — final chapter and citation cards</li>
+    {previews.map((chapter) => (
+      <li>
+        <a href={withBase(`${chapter.slug}/`)}>{chapter.title}</a> — {chapter.blurb}
+      </li>
+    ))}
   </ul>
 
   <h2 id="what-happens-next">What happens next</h2>
   <p>
-    Phase 3 replaces the placeholder routes with MDX content from a content collection, then
-    generates navigation, counts, and landing cards from that collection. The current data modules
-    become the collection schema.
+    Phase 4 verifies the four interactive widgets across keyboard, reduced-motion, and both colour
+    themes. Phase 5 generates the real landing cards and SEO output. Phase 6 switches production
+    from the legacy <code>dist/</code> build to Astro.
   </p>
 
   <SourceList ids={['vscode-agents', 'gh-copilot-memory']} />

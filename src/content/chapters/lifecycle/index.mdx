@@ -1,0 +1,58 @@
+---
+title: "Memory lifecycle"
+nav: "Lifecycle"
+group: "How memory behaves"
+order: 5
+blurb: "Capture, store, recall, validate, vote, expire. Step through the path a single memory takes."
+description: "Step through the six stations of a memory's life: capture, store, recall, validate, vote, and expire."
+lede: "Memory is not a database row that sits still. It is created, retrieved, checked against reality, reinforced or eroded, and eventually retired. Stepping through those six stations explains almost every surprising behaviour."
+tone: l4
+sources:
+  - gh-copilot-memory
+  - vscode-memory
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+import WidgetSection from '../../../components/widgets/WidgetSection.astro';
+
+## Follow one memory
+
+Press play, drag the slider, or step one station at a time. The quote on each card is taken straight from the official documentation.
+
+<WidgetSection
+  id="lifecycle"
+  title="Lifecycle player"
+  hint="Play, step, or scrub. Keyboard friendly."
+/>
+
+## What is never stored
+
+The system filters some content and instructs the model to avoid the rest. Knowing the list is useful: if you are relying on memory for something it will never hold, you need a different layer. <Cite id="gh-copilot-memory" />
+
+- **Secrets.** Tokens, keys, and credentials are detected and the memory is rejected.
+- **Model-control tokens.** Recognised patterns are rejected as a defence against prompt injection.
+- **Sensitive or confidential information** shared in confidence.
+- **Short-lived instructions.** Task-specific direction belongs in the conversation or in an instruction file, not in memory.
+
+<Callout variant="warn" label="Repository facts are shared">
+  <p>
+    Anything stored as a repository fact is visible to collaborators. Treat it as documentation,
+    not as private notes — and keep real rules in reviewed instruction files.
+  </p>
+</Callout>
+
+## Retention in numbers
+
+| Question | Cloud memory | Local memory files |
+| --- | --- | --- |
+| Default expiry | 90 days without reinforcement | No documented automatic expiry |
+| Configurable? | Repository facts: 7–180 days by org or enterprise | Not applicable |
+| What resets the clock | An upvote — retrieval alone does not | Updating the file |
+| What happens when it decays | Deleted after disuse; downvoted memories stop being used first | Stays until you ask the agent to change it |
+
+## Reading the lifecycle correctly
+
+Two misreadings are common. The first is that storage implies recall — it does not, because only a subset of memories is sent with a prompt. The second is that recall implies accuracy — it does not, because a fact is only as good as the citations it can still be checked against.
+
+Both are reasons to keep a reviewed instruction layer alongside memory: one is curated by a model, the other is curated by your team.

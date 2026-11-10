@@ -1,0 +1,59 @@
+---
+title: "Context assembly"
+nav: "Context assembly"
+group: "How memory behaves"
+order: 6
+blurb: "Instructions, skills, memory, and conversation all compete for the same context window. Watch what gets in."
+description: "Instructions, skills, repository memory, user memory, and conversation all compete for one finite context window. Toggle each source and watch what gets dropped."
+lede: "Every layer described so far is, in the end, a candidate for the same small space. The model never sees “memory” — it sees one assembled prompt, and something had to decide what made the cut."
+tone: accent
+sources:
+  - vscode-customization
+  - vscode-memory
+  - gh-copilot-memory
+  - vscode-agents
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+import WidgetSection from '../../../components/widgets/WidgetSection.astro';
+
+## What competes for the window
+
+Toggle the sources below. Pinned items are always included; the rest are subject to retrieval, ordering, and — when the window is full — eviction.
+
+<WidgetSection
+  id="context-flow"
+  title="Context assembly flow"
+  hint="Switches are keyboard operable; the window updates live."
+/>
+
+## Progressive disclosure is the whole trick
+
+Skills and task-relevant instructions are not loaded eagerly. The agent sees a name and a description, decides the workflow is relevant, and only then reads the full instructions and any bundled files. That keeps a large library of guidance from consuming the window before anyone needs it. <Cite id="vscode-customization" />
+
+| Source | Loaded when | Typical cost |
+| --- | --- | --- |
+| Conversation and tool output | Always | Largest and fastest growing |
+| Project instructions | Always | Fixed per turn |
+| File-scoped instructions | A file matches `applyTo` | Only while relevant |
+| Skills | The agent decides the workflow applies | Description first, body later |
+| Repository and user memory | Recalled at session start | Subset of everything stored |
+
+## Tokens are a budget, not a quota
+
+Loaded memories count toward token usage and can affect the credits an interaction consumes. A long instruction file, a large skill, and a verbose memory all compete with the actual task: reading the right file, running the right command, seeing the failing test. <Cite id="gh-copilot-memory" />
+
+<Callout variant="note" label="Practical rule">
+  <p>
+    Keep always-on instructions short and specific. Move specialised procedures into skills,
+    and let memory carry the accumulated detail that would otherwise bloat a permanent file.
+  </p>
+</Callout>
+
+## What this means in practice
+
+- **A bigger instruction file is not a better one.** Precision beats volume at every layer.
+- **Retrieval is a ranking problem.** Two memories can both be true and only one can be retrieved.
+- **Eviction is silent.** When something is dropped to fit, the model simply proceeds without it.
+- **Subagents isolate context.** Delegated work keeps intermediate noise out of the main window.

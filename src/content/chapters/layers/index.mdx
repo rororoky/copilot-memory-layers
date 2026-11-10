@@ -1,0 +1,72 @@
+---
+title: "The six layers"
+nav: "The six layers"
+group: "Foundations"
+order: 2
+blurb: "From model weights to reviewed instruction files: what each layer holds, how long it lives, and who can see it."
+description: "An interactive explorer of the six places Copilot's knowledge can live, from model weights to reviewed instruction files."
+lede: "Everything Copilot “knows” during a request comes from one of six places. They differ in who owns them, how long they survive, and — most importantly — who else can see them."
+tone: l1
+sources:
+  - vscode-memory
+  - vscode-agents
+  - gh-copilot-memory
+  - vscode-instructions
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import WidgetSection from '../../../components/widgets/WidgetSection.astro';
+
+## Explore the layers
+
+Select a band to see what it holds and how it reaches the model. The toggle highlights the four layers that outlive the conversation you are in right now.
+
+<WidgetSection
+  id="layer-stack"
+  title="Layer explorer"
+  hint="Click, tap, or use ↑ ↓ to move between layers."
+/>
+
+## All six at a glance
+
+| # | Layer | Lifetime | Scope | Who can see it |
+| --- | --- | --- | --- | --- |
+| **0** | Model weights | Permanent | Everyone using the model | Identical for all users |
+| **1** | Working memory | One conversation | One session | You, in that session |
+| **2** | Session memory | One conversation | One session | Never shared |
+| **3** | Repository memory | Across conversations | One workspace or repository | Local: you. Cloud: collaborators |
+| **4** | User memory | Across workspaces | One person | Only you |
+| **5** | Source-controlled knowledge | Versioned in Git | Repository or user profile | Anyone with repository access |
+
+## Layers are additive, not sequential
+
+It is tempting to read the stack as a pipeline — as if a fact starts as conversation and graduates into an instruction file. That is not what happens. All six are available at the same time, and the model sees a single assembled context.
+
+What does change is the **guarantee**. Working memory is always present. Instructions are loaded by rule. Memory is retrieved by relevance, which means a memory existing is not the same as a memory being used. <Cite id="gh-copilot-memory" />
+
+<div class="grid grid--2">
+  <div class="card">
+    <span class="card__kicker">Rule one</span>
+    <h3>Scope follows the audience</h3>
+    <p>
+      Who is the information true for? Everyone in the repository becomes repository memory.
+      Only you becomes user memory. The person who said it does not decide.
+    </p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">Rule two</span>
+    <h3>Persistence is not visibility</h3>
+    <p>
+      A local repository note persists for months and is still invisible to your teammates.
+      A cloud fact is visible to everyone with repository access the moment it is stored.
+    </p>
+  </div>
+</div>
+
+## What all six layers share
+
+- **They are lossy.** Context windows are finite, so anything that enters can be trimmed, summarised, or dropped.
+- **They compete for the same budget.** Every token a memory occupies is a token not spent on code, tests, or conversation.
+- **They can be wrong.** A stale repository fact and an out-of-date instruction file fail in different ways, but both fail.
+
+Chapter 03 puts scope under a microscope: three local scopes, five situations, and exactly what survives each one.

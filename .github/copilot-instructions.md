@@ -15,25 +15,31 @@ runtime**.
 ## Non-negotiables
 
 1. **Every factual claim needs a source.** Add or reuse an entry in `src/data/sources.ts`, then
-   cite it with `<a data-cite="source-id"></a>` in legacy HTML, or `<Cite id="source-id" />` in
-   Astro/MDX.
+   cite it with `<Cite id="source-id" />` in MDX and list the id in the chapter's frontmatter
+   `sources`. Legacy HTML uses `<a data-cite="source-id"></a>` plus a `data-sources` list.
 2. **Do not invent product behaviour.** If the official documentation does not say it, describe the
    gap instead of filling it.
 3. **No runtime dependencies.** No analytics, fonts, CDNs, or API calls. Everything ships in the
    bundle.
-4. **No runtime framework or client-side router.** Astro is a build-time scaffold only. Do not add
-   React/Vue/Svelte or a client router. Prose pages must ship no JavaScript.
+4. **No runtime framework or client-side router.** Astro is a build-time scaffold only. Runtime
+   JavaScript is limited to the shared chrome initialiser and the existing widget modules. Do not
+   add React/Vue/Svelte or a client router.
 5. **Mark volatile features.** Anything Experimental or in Preview gets a badge.
 
 ## Structure
 
-- `src/data/` — framework-neutral chapters, sources, and site metadata. Single source of truth.
-- `src/content/` — legacy adapters over `src/data/` for the Vite build.
-- `src/components/`, `src/layouts/`, `src/pages/` — Astro chrome and temporary routes.
+- `src/content.config.ts` — Astro content collection schema.
+- `src/content/chapters/<slug>/index.mdx` — the ten chapters. Source of truth for new content.
+- `src/data/` — framework-neutral chapters, sources, and site metadata. The legacy manifest is
+  temporarily asserted against the collection until cutover.
+- `src/content/nav.ts`, `src/content/sources.ts` — legacy adapters over `src/data/`.
+- `src/components/`, `src/layouts/`, `src/pages/` — Astro chrome, layouts, and collection routes.
+- `src/components/widgets/` — `WidgetSection` mounts the existing diagrams.
 - `src/ui/` — legacy site chrome, animation helpers, DOM utilities.
 - `src/widgets/` — the four interactive diagrams. Each exports a `mountX(root)` function.
 - `src/styles/` — tokens, base layout, widgets.
-- `<chapter>/index.html` — legacy chapter pages; URLs stay clean on GitHub Pages.
+- `<chapter>/index.html` — legacy chapter pages; frozen until Phase 6.
+- `.github/instructions/mdx.instructions.md` — chapter MDX authoring rules.
 
 ## Accessibility
 

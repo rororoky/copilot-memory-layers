@@ -1,0 +1,99 @@
+---
+title: "Local memory scopes"
+nav: "Local memory scopes"
+group: "How memory behaves"
+order: 3
+blurb: "Session, repository, and user memory files: what survives a new chat, a different workspace, or a different person."
+description: "Session, repository, and user memory files: what survives a new chat, a different workspace, a different person, and thirty days of silence."
+lede: "The Local harness writes memories to files on your machine, in three scopes that are easy to confuse and easy to check. Each one answers a different question about how long a fact should survive."
+tone: l2
+sources:
+  - vscode-memory
+  - vscode-instructions
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+import WidgetSection from '../../../components/widgets/WidgetSection.astro';
+
+## Three directories, three questions
+
+```text
+/memories/                 user memory      ← across all workspaces
+/memories/repo/            repository memory ← this workspace only
+/memories/session/         session memory    ← this conversation only
+```
+
+<div class="grid grid--3">
+  <div class="card">
+    <span class="card__kicker" style="color: var(--l2)">Session</span>
+    <h3>Scratch space</h3>
+    <p>
+      In-progress plans, intermediate findings, decisions made mid-task. Disappears when the
+      conversation does.
+    </p>
+  </div>
+  <div class="card">
+    <span class="card__kicker" style="color: var(--l3)">Repository</span>
+    <h3>Project notes</h3>
+    <p>
+      Build commands, architectural decisions, naming conventions. Persists across
+      conversations in the workspace — and stays on your machine.
+    </p>
+  </div>
+  <div class="card">
+    <span class="card__kicker" style="color: var(--l4)">User</span>
+    <h3>Personal preferences</h3>
+    <p>
+      How you like to work, independent of project. The first 200 lines load automatically at
+      the start of every session.
+    </p>
+  </div>
+</div>
+
+## Test what survives
+
+Change the situation and watch which knowledge survives. The interesting column is the middle one: local repository memory is durable *and* private, which no other repository-scoped layer manages.
+
+<WidgetSection
+  id="scope-matrix"
+  title="Scope survival matrix"
+  hint="Five situations × three scopes × three storage layers."
+/>
+
+## Working with the files
+
+You do not need to edit memory files by hand — ask the agent to remember, update, or forget something and it chooses the scope. Two commands manage the files directly. <Cite id="vscode-memory" />
+
+| Command | What it does |
+| --- | --- |
+| `Chat: Show Memory Files` | Lists every memory file across all scopes; select one to read it. |
+| `Chat: Clear All Memory Files` | Removes every memory file in every scope. There is no per-file delete command. |
+
+<Callout variant="note" label="Asking is enough">
+  <p>
+    “Remember that I prefer concise commit message subjects” is a complete instruction. The
+    agent picks the scope, creates or updates the file, and cites it next time it is relevant.
+  </p>
+</Callout>
+
+## Repository-local storage is experimental
+
+With `chat.copilot.memory.local.enabled` turned on — it is off by default — Copilot harness sessions can store repository memories in `.github/copilot-memories.jsonl` instead of the cloud service. It requires a GitHub-hosted repository and does not support user-scoped memories. <Cite id="vscode-memory" />
+
+<Callout variant="warn" label="Review before you commit">
+  <p>
+    That file sits in the working tree and can be included in commits, including commits made
+    by the agent. Cloud settings and organisation policies do not apply to it. Read the
+    contents before you share it, and never store credentials.
+  </p>
+</Callout>
+
+## Memory or shared project guidance?
+
+Local memory is deliberately personal. When a repository fact stops being yours alone — when the team depends on it — it should move into source control, where it can be reviewed and maintained.
+
+1. Verify the fact against the code and configuration.
+2. Move it to the appropriate project document or instruction file.
+3. Review the change through your normal process.
+4. Update or remove the local memory so the two cannot drift apart.

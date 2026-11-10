@@ -2,9 +2,10 @@
 applyTo: '**/*.html'
 ---
 
-# Documentation page rules
+# Documentation page rules (legacy HTML)
 
-These apply to every chapter page.
+These apply to the legacy root chapter HTML until cutover. New chapter content belongs in
+`src/content/chapters/**/*.mdx`; see `mdx.instructions.md` for that workflow.
 
 ## Head
 

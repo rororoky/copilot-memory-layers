@@ -1,13 +1,14 @@
 ---
-import { chapters, groups } from '../../data/chapters';
+import { groups, type Chapter } from '../../data/chapters';
 import { site } from '../../data/site';
 import { withBase } from '../../lib/url';
 
 interface Props {
   current?: string;
+  chapters: Chapter[];
 }
 
-const { current = 'home' } = Astro.props;
+const { current = 'home', chapters } = Astro.props;
 ---
 
 <aside class="sidebar" id="sidebar" aria-label="Chapters">

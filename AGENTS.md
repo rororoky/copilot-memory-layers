@@ -7,21 +7,22 @@ Read it before making structural changes.
 
 A static, source-backed educational site about GitHub Copilot memory layers. It is built with
 Vite and strict TypeScript, ships no runtime dependencies, and makes no network requests after
-load. Every factual claim is tied to an entry in `src/content/sources.ts`.
+load. Every factual claim is tied to an entry in `src/data/sources.ts`.
 
 ## Read first
 
 1. `.github/copilot-instructions.md` — current non-negotiables and commands.
-2. `.github/instructions/docs.instructions.md` — rules for chapter HTML (current architecture).
-3. `.github/instructions/widgets.instructions.md` — rules for interactive widgets.
-4. **`docs/upgrade-plan.md` — the Astro migration plan. Status: Phase 2 complete; Phase 3+ not started.**
+2. `.github/instructions/mdx.instructions.md` — rules for chapter MDX (current authoring path).
+3. `.github/instructions/docs.instructions.md` — rules for the frozen legacy HTML pages.
+4. `.github/instructions/widgets.instructions.md` — rules for interactive widgets.
+5. **`docs/upgrade-plan.md` — the Astro migration plan. Status: Phases 1–4 complete; Phase 5+ not started.**
 
 ## Upgrade plan (durable context)
 
 The canonical plan is [`docs/upgrade-plan.md`](./docs/upgrade-plan.md). It is a repository-scoped
 decision record. Do not create a parallel plan; update that document instead.
 
-**Status:** Phase 2 complete (build-time chrome and data layer), Phase 3+ not started.
+**Status:** Phases 1–4 complete (MDX content, widgets, verification), Phase 5+ not started.
 **Decision owner:** tommy.
 **Created:** 2026-11-10; updated 2026-11-10.
 
@@ -44,16 +45,21 @@ reused.
 - Keep every public URL unchanged: `/concepts/`, `/layers/`, etc.
 - Keep GitHub Pages static hosting: real `index.html` per route, no client-side router.
 - Use base-aware links (`withBase()`) so the site works at both `/` and `/<repo>/`.
-- Preserve zero JS on prose-only pages.
+- Keep runtime JavaScript limited to the shared chrome initialiser and the existing widget modules.
+  Do not add a runtime framework or client-side router.
 
-### Current vs. proposed authoring
+### Authoring now
 
-**Current:** adding a chapter touches seven places — the page folder, `src/content/nav.ts`,
-`vite.config.ts`, the landing page, the hero count, `README.md`, and the source registry.
+**Astro (current):** add one `src/content/chapters/<slug>/index.mdx` file with frontmatter.
+Navigation, pager, TOC, and bibliography update automatically. Add a source entry only if the
+chapter introduces a new official source.
 
-**Proposed:** add one `src/content/chapters/<slug>/index.mdx` file with frontmatter. Navigation,
-pager, landing card, counts, TOC, and bibliography update automatically. Add a source entry only
-if the chapter introduces a new official source.
+**Legacy HTML (frozen):** the old root pages touched seven places — the page folder,
+`src/content/nav.ts`, `vite.config.ts`, the landing page, the hero count, `README.md`, and the
+source registry. Do not add new content there.
+
+Until Phase 6, also update `src/data/chapters.ts` for a new or renamed chapter; the build asserts
+that the legacy manifest matches the collection.
 
 ### Migration phases
 
@@ -62,8 +68,8 @@ if the chapter introduces a new official source.
 | 0 | Baseline screenshots, link audit, branch | Not started |
 | 1 | Scaffold Astro, configure `base`/`site`/404, deploy a smoke build | **Complete** (2026-11-10) |
 | 2 | Build layouts, chrome components, chapter data, URL helper | **Complete** (2026-11-10) |
-| 3 | Convert chapters to MDX, one at a time | Not started |
-| 4 | Wrap the four widgets; verify keyboard/reduced-motion behavior | Not started |
+| 3 | Convert chapters to MDX, one at a time | **Complete** (2026-11-10) |
+| 4 | Wrap the four widgets; verify keyboard/reduced-motion behavior | **Complete** (2026-11-10) |
 | 5 | Generate landing cards; add sitemap, canonical, OG, JSON-LD, optional Pagefind | Not started |
 | 6 | Delete legacy HTML/chrome, update docs and CI | Not started |
 
@@ -116,15 +122,52 @@ Update the status column and the canonical plan when a phase is completed.
 - Verified with `BASE_PATH=/` and `BASE_PATH=/copilot-memory-layers`: 12 Astro pages, 0 check
   errors, no broken links, and the legacy build/link check pass.
 
+### Phase 3 notes (implemented)
+
+- Added `src/content.config.ts` with a `chapters` collection. Each chapter is
+  `src/content/chapters/<slug>/index.mdx`.
+- Frontmatter is validated by Zod: `title`, `nav`, `group`, `order`, `blurb`, `description`,
+  optional `lede`, `tone`, `sources`, and `draft`.
+- `src/lib/chapters.ts` loads collection entries, sorts by `order`, verifies unique orders and
+  known source ids, and temporarily asserts that the collection matches
+  `src/data/chapters.ts` until the legacy site is removed.
+- `src/pages/[...slug].astro` now renders real MDX content through `ChapterLayout`. The old
+  placeholder content is gone.
+- All ten chapters migrated from hand-written HTML to MDX. The extracted text matches the
+  legacy pages; the only added text is the build-time source-card list.
+- Markdown tables are automatically wrapped in `.table-wrap` by
+  `src/lib/rehype-wrap-tables.mjs`, so authors write plain tables.
+- `Cite`, `Callout`, `Figure`, and `Badge` are used directly in MDX. Every citation is resolved
+  at build time.
+- `SourceList` is rendered automatically from frontmatter `sources`.
+- Syntax highlighting is disabled so code blocks keep the site's own token styling.
+- Smartypants is disabled to preserve exact code/quotes from the source pages.
+
+### Phase 4 notes (implemented with Phase 3)
+
+- `src/components/widgets/WidgetSection.astro` wraps the existing vanilla TypeScript widgets and
+  mounts them on the four interactive pages. The widget code itself is unchanged.
+- Browser verification with Playwright against the Astro dev server:
+  - layer explorer: 6 bands, band selection and keyboard arrow navigation
+  - scope matrix: 9 cells, scenario switching by keyboard
+  - lifecycle player: stage stepping and reduced-motion play
+  - context flow: source toggles and eviction status
+  - theme toggle and source cards
+  - no console or page errors
+- The widget script is bundled only on pages that import `WidgetSection`. It currently imports
+  all four widgets together; a later optimization can split them per page.
+
 ### Guardrails for agents
 
-- **Phase 2 is complete; do not start Phase 3+ without explicit approval.** The current site
+- **Phases 1–4 are complete; do not start Phase 5+ without explicit approval.** The current site
   must remain deployable.
 - **Read `docs/upgrade-plan.md` before changing the information architecture.**
 - **Do not replace the production build target** (`dist/`) until Phase 6. Astro currently builds
   to `dist-astro/` for verification only.
-- **Do not treat `src/pages/[...slug].astro` placeholders as content.** They exist to exercise
-  chrome and must be replaced by the content collection in Phase 3.
+- **Chapter content lives in `src/content/chapters/<slug>/index.mdx`.** Do not add new content to
+  the legacy root HTML pages.
+- **Keep `src/data/chapters.ts` in sync with the MDX frontmatter until Phase 6.** The build
+  asserts that the legacy manifest and the collection agree.
 - **Do not implement a framework migration piecemeal** without following the phase plan; a
   half-migrated site is worse than the current one.
 - **Keep content out of components.** Components render patterns; chapter prose lives in MDX.
@@ -137,17 +180,17 @@ Update the status column and the canonical plan when a phase is completed.
 ### Framework rule
 
 The original “No framework” rule was updated in Phase 2. Astro is allowed **at build time only**:
-it generates static HTML, the runtime remains dependency-free, and prose pages must ship no
-JavaScript. Do not add React/Vue/Svelte or a client-side router.
+it generates static HTML and the runtime remains dependency-free. Runtime JavaScript is limited to
+the shared chrome initialiser and the existing widget modules. Do not add React/Vue/Svelte or a
+client-side router.
 
-Phases 1–2 are approved and the Astro chrome is in place, but the legacy site still owns the
-production artifact. Until later phases are approved:
+Phases 1–4 are approved and the Astro site is content-complete, but the legacy site still owns
+the production artifact. Until later phases are approved:
 
 - Keep the legacy site and `dist/` deploy path working.
-- Do not migrate chapter content yet; the placeholder routes are not the real pages.
+- Treat `src/content/chapters/` as the source of truth for new content.
 - Do not change the GitHub Pages artifact from `dist` to `dist-astro`.
-- Update `.github/instructions/docs.instructions.md` (and add MDX authoring rules) during the
-  Phase 3 content migration.
+- Use `.github/instructions/mdx.instructions.md` for MDX authoring rules.
 
 ## Current commands
 
@@ -168,20 +211,24 @@ npm run check:links:astro
 
 ## Current structure
 
-- `src/data/` — framework-neutral `chapters.ts`, `sources.ts`, and `site.ts`.
+- `src/content.config.ts` — Astro content collection schema.
+- `src/content/chapters/<slug>/index.mdx` — the ten migrated chapters.
+- `src/data/` — framework-neutral `chapters.ts`, `sources.ts`, and `site.ts` (legacy manifest
+  still asserted against the collection).
 - `src/content/nav.ts`, `src/content/sources.ts` — legacy adapters over `src/data/`.
 - `src/ui/chrome.ts` — legacy runtime chrome.
 - `src/ui/anim.ts` — legacy adapter over `src/lib/motion.ts`.
 - `src/widgets/` — four `mountX(root)` diagrams.
 - `src/styles/` — tokens, base layout, widget styles.
-- `<chapter>/index.html` — one directory per chapter (legacy architecture).
+- `<chapter>/index.html` — legacy chapter pages; frozen until cutover.
 - `astro.config.mjs` — Astro config; outputs to `dist-astro/`.
-- `src/pages/` — Astro routes: `index`, `404`, and temporary `[...slug]` placeholders.
+- `src/pages/` — Astro routes: `index`, `404`, and the collection-driven `[...slug]`.
 - `src/layouts/` — `BaseLayout` and `ChapterLayout`.
 - `src/components/chrome/` — build-time navigation and footer components.
 - `src/components/content/` — `PageHead`, `Cite`, `SourceList`, `Badge`, `Callout`, `Figure`, `TableWrap`.
+- `src/components/widgets/` — `WidgetSection`, which mounts the existing diagrams.
 - `src/scripts/chrome.ts` — client initialiser for theme, mobile nav, TOC, and reveals.
-- `src/lib/` — `url.ts`, `motion.ts`, and `toc.ts`.
+- `src/lib/` — `chapters.ts`, `url.ts`, `motion.ts`, `toc.ts`, and the table rehype plugin.
 - `scripts/check-links.mjs` — accepts an output directory and validates same-page anchors.
 - `docs/upgrade-plan.md` — Astro migration design and progress.
 - `AGENTS.md` — this guide.

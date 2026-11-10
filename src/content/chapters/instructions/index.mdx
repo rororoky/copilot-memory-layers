@@ -1,0 +1,97 @@
+---
+title: "The instruction layer"
+nav: "Instruction layer"
+group: "Working with it"
+order: 7
+blurb: "Repository-owned, version-controlled guidance: instructions, prompts, skills, custom agents, and hooks."
+description: "Repository-owned, reviewable guidance: project instructions, file-scoped instructions, prompt files, skills, custom agents, hooks, and MCP servers."
+lede: "This is the only layer your team can review line by line. It lives in the repository, moves through pull requests, and can be audited. It is also the layer people most often confuse with memory."
+tone: l5
+sources:
+  - vscode-instructions
+  - vscode-prompts
+  - vscode-customization
+  - vscode-overview
+---
+
+import Cite from '../../../components/content/Cite.astro';
+import Callout from '../../../components/content/Callout.astro';
+
+## Why this layer exists
+
+Accumulated memory is convenient precisely because nobody has to maintain it. That is also its weakness: you cannot guarantee what it says, when it is recalled, or how it is paraphrased. For anything that must be stated exactly — a security rule, a mandatory review step, a test command — you need authored text. <Cite id="vscode-instructions" />
+
+## The artefacts
+
+| File | What it is for | How it activates | Lives in |
+| --- | --- | --- | --- |
+| `copilot-instructions.md`<br />`AGENTS.md` | Project-wide conventions, commands, architecture rules. | Always included | Repository root or `.github/` |
+| `*.instructions.md` | Targeted guidance for one language, folder, or task. | `applyTo` glob, or task relevance in Local sessions | `.github/instructions/` |
+| `*.prompt.md` | One focused task, invoked as a slash command. | Manual, by you | `.github/prompts/` or user profile |
+| `SKILL.md` | A multi-step workflow with scripts and templates. | On demand, via progressive disclosure | `.github/skills/<name>/` |
+| `*.agent.md` | A role with its own instructions, tools, and model. | Selected as the agent for a task | `.github/agents/` or user profile |
+| Hooks | Shell commands at lifecycle events, such as formatting after an edit. | Harness-triggered, not model-requested | Hook configuration |
+| MCP servers | Access to external systems and data. | Tool call chosen by the model | Server configuration |
+
+<p class="muted">
+  Prompt files run only in Local harness sessions. For a reusable workflow in another harness,
+  use a skill. <Cite id="vscode-prompts" />
+</p>
+
+## Four ways guidance reaches a request
+
+<div class="grid grid--2">
+  <div class="card">
+    <span class="card__kicker">1 · Always on</span>
+    <h3>Project instructions</h3>
+    <p>Included in every request in the repository. Broad rules belong here, and only broad rules.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">2 · Pattern matched</span>
+    <h3>File-scoped instructions</h3>
+    <p>A glob such as <code>tests/**/*.py</code> decides when the guidance is attached.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">3 · Task relevance</span>
+    <h3>Described instructions</h3>
+    <p>In Local sessions a <code>description</code> lets the agent decide whether to read the file.</p>
+  </div>
+  <div class="card">
+    <span class="card__kicker">4 · Manual</span>
+    <h3>Prompt files</h3>
+    <p>You invoke them. Nothing loads until you type the slash command.</p>
+  </div>
+</div>
+
+<Callout variant="note" label="The cost of always-on">
+  <p>
+    <code>applyTo: "**"</code> means “attach this to every file request”, which spends context on
+    every turn whether or not it is relevant. Prefer narrow globs unless the rule truly applies
+    everywhere.
+  </p>
+</Callout>
+
+## Instructions are not enforcement
+
+Guidance that is loaded can still be misread, partially followed, or skipped. The harness does not verify compliance. Deterministic behaviour comes from hooks, tests, and review gates — the parts of the system that do not depend on the model choosing to comply. <Cite id="vscode-customization" />
+
+| Mechanism | Nature | Use when |
+| --- | --- | --- |
+| Instructions, skills | Model-driven guidance | The model should decide how to apply it |
+| Custom agents | Mixed: role text plus harness-enforced tool limits | You need a narrower role or a tool boundary |
+| Tools and MCP | Model chooses whether to call | The capability is optional per task |
+| Hooks | Deterministic, harness-triggered | The step must happen every time |
+
+## Verify in three stages
+
+Most “my instructions do not work” problems are one of three failures. Diagnose the stage before editing the text.
+
+1. **Discovery** — is the file listed, with no validation errors?
+2. **Inclusion** — did this request actually attach it?
+3. **Effectiveness** — did the result follow it?
+
+Repeat a representative task in a fresh chat and leave the rule out of your prompt. If the agent still applies it, the instruction is doing its job. <Cite id="vscode-overview" />
+
+## This site's own instruction files
+
+The repository that builds this site contains a real `.github/copilot-instructions.md` and a file-scoped `.github/instructions/docs.instructions.md`. They are small, because a documentation site only needs a few durable rules — which is the point.

@@ -1,5 +1,5 @@
 ---
-import { chapterBySlug, type Chapter } from '../../data/chapters';
+import type { Chapter } from '../../data/chapters';
 import { withBase } from '../../lib/url';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 const { current, prev, next } = Astro.props;
 const isLast = current?.slug === 'sources';
-const nextChapter = next ?? (isLast ? undefined : chapterBySlug('sources'));
+const nextChapter = next;
 ---
 
 <nav class="pager" aria-label="Chapter navigation">

@@ -57,15 +57,14 @@ npm run check:links
 
 Node 22.23.4 is required (see `.nvmrc`; Astro 7 requires this minimum).
 
-### Astro migration scaffold (Phase 2)
+### Astro migration scaffold (Phases 3–4)
 
-The Astro scaffold builds alongside the legacy Vite site. It writes to `dist-astro/`; the
-production build still writes to `dist/`, so the live site is unchanged until the migration
-reaches cutover.
+The Astro site builds alongside the legacy Vite site. It writes to `dist-astro/`; the production
+build still writes to `dist/`, so the live site is unchanged until the migration reaches cutover.
 
-Phase 2 adds the framework-neutral data layer and the build-time chrome: topbar, sidebar, TOC,
-pager, footer, theme toggle, citations, and source cards. The chapter routes are temporary
-placeholders until Phase 3 moves the real content into MDX.
+All ten chapters now live in `src/content/chapters/<slug>/index.mdx`. Frontmatter drives the
+navigation, pager, TOC, meta description, and bibliography. The four interactive diagrams mount
+from the existing vanilla TypeScript widgets through `WidgetSection`.
 
 ```bash
 npm run dev:astro      # Astro dev server
@@ -77,6 +76,31 @@ npm run check:links:astro
 ```
 
 The full design and phase plan live in [`docs/upgrade-plan.md`](./docs/upgrade-plan.md).
+
+### Add or edit a chapter
+
+Create `src/content/chapters/<slug>/index.mdx` with frontmatter:
+
+```yaml
+---
+title: The six layers
+nav: The six layers
+group: Foundations
+order: 2
+blurb: Short card description.
+description: Meta description for search and social previews.
+lede: Visible page introduction.
+tone: l1
+sources:
+  - vscode-memory
+  - gh-copilot-memory
+---
+```
+
+Write the body as Markdown/MDX. Use `<Cite id="..."/>` for citations, `<Callout>`,
+`<Figure>`, and `<WidgetSection>` for shared patterns. Navigation, pager, TOC, and the source
+list update automatically. Until Phase 6, also keep `src/data/chapters.ts` in sync because the
+build asserts that the legacy manifest matches the collection.
 
 ## Deploy to GitHub Pages
 
@@ -90,24 +114,27 @@ organisation site the value resolves to `/`.
 ## Project layout
 
 ```
-├── index.html                 landing page
-├── <chapter>/index.html       one directory per chapter, clean URLs
+├── index.html                 legacy landing page
+├── <chapter>/index.html       legacy chapter pages (frozen until cutover)
 ├── 404.html
 ├── astro.config.mjs           Astro config (builds to dist-astro/)
 ├── src/
+│   ├── content.config.ts      chapter collection schema
+│   ├── content/chapters/      ten MDX chapters
 │   ├── data/                  chapters, sources, and site metadata
 │   ├── content/nav.ts         legacy adapter over src/data
 │   ├── content/sources.ts     legacy adapter over src/data
 │   ├── components/chrome/     build-time Topbar, Sidebar, Toc, Pager, Footer
-│   ├── components/content/    PageHead, Cite, SourceList, Badge, Callout
+│   ├── components/content/    PageHead, Cite, SourceList, Badge, Callout, Figure
+│   ├── components/widgets/    WidgetSection mounts the existing diagrams
 │   ├── layouts/               BaseLayout and ChapterLayout
-│   ├── pages/                 index, 404, and temporary chapter routes
+│   ├── pages/                 index, 404, and collection-driven chapter routes
 │   ├── scripts/chrome.ts      theme, mobile nav, TOC, and reveal behaviour
 │   ├── ui/chrome.ts           legacy runtime chrome
 │   ├── ui/anim.ts             legacy adapter over src/lib/motion
 │   ├── widgets/               the four interactive diagrams
 │   ├── styles/                tokens, base layout, widget styles
-│   └── lib/                   url, motion, and TOC helpers
+│   └── lib/                   chapters, url, motion, TOC, and rehype helpers
 ├── docs/upgrade-plan.md       migration design, progress, and status
 ├── AGENTS.md                  repo-level guide for AI agents
 └── .github/                   deploy workflow + real instruction files

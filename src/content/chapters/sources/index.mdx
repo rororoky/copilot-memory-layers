@@ -1,0 +1,59 @@
+---
+title: "Sources and method"
+nav: "Sources"
+group: "Working with it"
+order: 10
+blurb: "Every official article this site is built from, with the date each was last checked."
+description: "Every official page this site is built from, the date each was checked, and what this site deliberately does not claim."
+lede: "This site is a reading aid, not a primary source. Every factual statement is traceable to one of these pages, and each one records the date it was read."
+tone: accent
+sources:
+  - vscode-memory
+  - gh-copilot-memory
+  - vscode-agents
+  - vscode-overview
+  - vscode-instructions
+  - vscode-customization
+  - vscode-prompts
+---
+
+import Callout from '../../../components/content/Callout.astro';
+
+## Method
+
+1. Read the official page directly — documentation, not blog posts or summaries.
+2. Quote the exact sentence when a claim depends on wording.
+3. Record the verification date, because product behaviour changes.
+4. Mark anything experimental or in preview as such.
+5. Leave gaps visible instead of filling them with plausible guesses.
+
+## What this site does not claim
+
+- **No internal implementation details.** How retrieval is scored, how the vote threshold is set, and how contexts are trimmed are not documented publicly, so they are described here only in the terms the docs use.
+- **No promise of stability.** Features labelled Experimental or Preview can change at any time.
+- **No measurement of your setup.** The token counts in the context widget are illustrative, not measurements of a real request.
+- **No affiliation.** This is an independent educational resource; it is not endorsed by GitHub or Microsoft.
+
+## Known limits of this page
+
+| Area | Why it is summarised rather than detailed |
+| --- | --- |
+| Plan-level defaults | Defaults differ by plan and by surface, and change over time. Confirm in your own settings. |
+| Organisation controls | Policy surface differs between Copilot Business and Copilot Enterprise. |
+| Harness differences | Local, Copilot, Claude, and Codex harnesses read different customisations. |
+| Memory internals | Voting weights, thresholds, and retrieval scoring are not published. |
+
+## Corrections
+
+If a statement here contradicts the official documentation, the documentation wins. Open an issue with the page URL and the sentence that is wrong, and include the verification date so the correction can be checked against the page as it stood.
+
+<Callout variant="note" label="Re-verify before relying">
+  <p>
+    Documentation moves. If you are making a decision that depends on a detail here, open the
+    linked source and read the current version.
+  </p>
+</Callout>
+
+## All sources
+
+Seven pages, last checked on 10 November 2026. Citation numbers elsewhere on the site point at these cards.

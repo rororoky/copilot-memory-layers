@@ -1,0 +1,36 @@
+---
+interface Props {
+  id: 'layer-stack' | 'scope-matrix' | 'lifecycle' | 'context-flow';
+  title: string;
+  hint: string;
+}
+
+const { id, title, hint } = Astro.props;
+---
+
+<section class="widget reveal" aria-labelledby={`${id}-title`}>
+  <div class="widget__head">
+    <p class="widget__title" id={`${id}-title`}>{title}</p>
+    <p class="widget__hint">{hint}</p>
+  </div>
+  <div class="widget__body" data-widget={id}></div>
+</section>
+
+<script>
+  import { mountLayerStack } from '../../widgets/layerStack';
+  import { mountScopeMatrix } from '../../widgets/scopeMatrix';
+  import { mountLifecycle } from '../../widgets/lifecycle';
+  import { mountContextFlow } from '../../widgets/contextFlow';
+
+  const mounts = {
+    'layer-stack': mountLayerStack,
+    'scope-matrix': mountScopeMatrix,
+    lifecycle: mountLifecycle,
+    'context-flow': mountContextFlow,
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-widget]').forEach((host) => {
+    const mount = mounts[host.dataset.widget as keyof typeof mounts];
+    if (mount) mount(host);
+  });
+</script>
