@@ -34,31 +34,12 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      # Phase 1 smoke build. Production still deploys the legacy `dist/` output
-      # below; this proves Astro, the base path, and the 404 route build in CI.
-      - name: Verify Astro scaffold
-        run: npm run verify:astro
-        env:
-          BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          SITE_URL: https://${{ github.repository_owner }}.github.io
-
-      - name: Upload Astro smoke build
-        uses: actions/upload-artifact@v4
-        with:
-          name: astro-smoke
-          path: dist-astro
-          retention-days: 7
-
-      - name: Build
-        run: npm run build
+      - name: Verify and build
+        run: npm run verify
         env:
           # "/" for user and organisation sites, "/<repo>/" for project sites.
-          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
-
-      - name: Check internal links
-        run: npm run check:links
-        env:
-          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

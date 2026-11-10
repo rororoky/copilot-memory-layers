@@ -12,6 +12,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": [".astro/types.d.ts", "src", "vite.config.ts"],
-  "exclude": ["dist", "dist-astro"]
+  "include": [".astro/types.d.ts", "src"],
+  "exclude": ["dist"]
 }

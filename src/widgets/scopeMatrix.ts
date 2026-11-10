@@ -1,4 +1,4 @@
-import { h, qs } from '../ui/dom';
+import { h, qs } from '../lib/dom';
 
 type CellState = 'kept' | 'cleared' | 'private' | 'stale' | 'na';
 

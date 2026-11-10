@@ -1,4 +1,4 @@
-/** Scroll-reveal and motion preference helpers shared by Astro and the legacy site. */
+/** Scroll-reveal and motion preference helpers shared by the chrome and widgets. */
 
 export function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

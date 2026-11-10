@@ -1,16 +1,12 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { chapters as legacyChapters, type Chapter } from '../data/chapters';
+import type { Chapter } from '../data/chapters';
 import { getSource } from '../data/sources';
 
 export type ChapterEntry = CollectionEntry<'chapters'>;
 
 let cachedEntries: Promise<ChapterEntry[]> | undefined;
 
-/**
- * Load published chapters in order and validate them against the legacy chapter
- * manifest. The assertion is temporary: it keeps the Vite site and the Astro
- * collection in sync until the legacy site is removed at cutover.
- */
+/** Load published chapters in order and validate their shared constraints. */
 export function getChapterEntries(): Promise<ChapterEntry[]> {
   cachedEntries ??= getCollection('chapters', ({ data }) => !data.draft).then((entries) => {
     const sorted = [...entries].sort((a, b) => a.data.order - b.data.order);
@@ -55,19 +51,5 @@ function validateEntries(entries: ChapterEntry[]): void {
     for (const source of entry.data.sources) {
       getSource(source);
     }
-  }
-
-  const actual = entries.map(entryToChapter);
-  const expected = legacyChapters.map((chapter) => ({ ...chapter }));
-
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      [
-        'Chapter collection does not match src/data/chapters.ts.',
-        'Update the legacy manifest or the MDX frontmatter so they agree.',
-        `Expected: ${JSON.stringify(expected)}`,
-        `Actual:   ${JSON.stringify(actual)}`,
-      ].join('\n'),
-    );
   }
 }

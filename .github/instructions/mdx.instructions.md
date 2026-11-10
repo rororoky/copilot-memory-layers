@@ -51,8 +51,3 @@ Do not add `num` or `slug`. Both are derived from `order` and the directory name
 - Mark Experimental or Preview features with a badge.
 - Keep the prose voice consistent with the existing chapters: direct, specific, and explicit about
   uncertainty.
-
-## Migration constraint
-
-Until Phase 6 removes the legacy site, also update `src/data/chapters.ts` when adding or renaming a
-chapter. The build asserts that the legacy manifest matches the collection.

@@ -1,5 +1,5 @@
-import { getSource, sourceIndex } from '../content/sources';
-import { escapeHtml, h } from '../ui/dom';
+import { getSource, sourceIndex } from '../data/sources';
+import { escapeHtml, h } from '../lib/dom';
 
 interface Layer {
   index: number;

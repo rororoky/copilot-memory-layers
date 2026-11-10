@@ -5,10 +5,8 @@ import { unified } from '@astrojs/markdown-remark';
 import rehypeWrapTables from './src/lib/rehype-wrap-tables.mjs';
 
 /**
- * Phase 1 scaffold.
- *
- * The legacy Vite site still builds to `dist/`. Astro builds to `dist-astro/`
- * until the migration reaches cutover, so production remains deployable.
+ * Astro is the production site generator. It emits real static HTML to `dist/`,
+ * so GitHub Pages serves a file per route without a client-side router.
  *
  * BASE_PATH is supplied by the GitHub Pages workflow:
  *   /                      -> user or organisation site
@@ -21,7 +19,7 @@ export default defineConfig({
   site: process.env.SITE_URL ?? 'https://rororoky.github.io',
   base,
   output: 'static',
-  outDir: './dist-astro',
+  outDir: './dist',
   trailingSlash: 'always',
   build: { format: 'directory' },
   markdown: {

@@ -1,4 +1,4 @@
-import { h, formatNumber } from '../ui/dom';
+import { h, formatNumber } from '../lib/dom';
 
 interface ContextSource {
   id: string;

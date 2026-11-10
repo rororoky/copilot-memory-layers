@@ -1,7 +1,7 @@
 ---
 title: Astro upgrade plan for copilot-memory-layers
 scope: repository
-status: phase-5-complete
+status: complete
 created: 2026-11-10
 updated: 2026-11-11
 owner: tommy
@@ -115,8 +115,28 @@ Those remain Phase 5+.
   all four widgets still working.
 - Pagefind search is intentionally deferred; it is optional and not required for cutover.
 
-**Not done yet:** the production deploy switch, removal of the legacy Vite site, and final
-documentation/CI cleanup. Those remain Phase 6.
+### 2026-11-11 — Phase 6 complete
+
+- Switched `astro.config.mjs` to build directly to `dist/`; `dist-astro/` is gone.
+- Deleted the legacy root HTML pages, chapter directories, `vite.config.ts`, `src/main.ts`,
+  `src/ui/chrome.ts`, `src/ui/anim.ts`, and the `src/content/nav.ts` / `src/content/sources.ts`
+  adapters.
+- Moved `src/ui/dom.ts` to `src/lib/dom.ts` and updated the widget imports.
+- Removed the legacy manifest assertion. The Astro collection is now the only chapter source.
+- Reduced `src/data/chapters.ts` to the `Chapter` view model, group list, and top-nav slug list.
+- Replaced the legacy package scripts with Astro scripts: `dev`, `build`, `preview`, `check`,
+  `check:links`, and `verify`.
+- Updated the deploy workflow to run `npm run verify` and upload `dist/`.
+- Replaced the Astro smoke workflow with a CI matrix that verifies both `/` and
+  `/copilot-memory-layers/`.
+- Removed the obsolete legacy HTML instruction file; the MDX and widget instruction files remain.
+- Rewrote `README.md`, `AGENTS.md`, `.github/copilot-instructions.md`, and `CONTRIBUTING.md` for
+  the Astro-only structure.
+- Full verification: `npm run verify`, both base paths, legacy references gone, and the final
+  artifact is `dist/`.
+
+**Migration complete.** The remaining work is ordinary maintenance: content updates, dependency
+updates, and optional enhancements such as Pagefind search.
 
 ### Version decisions
 
@@ -127,15 +147,16 @@ documentation/CI cleanup. Those remain Phase 6.
 | `@astrojs/sitemap` | 3.7.4 | Sitemap output for canonical URLs |
 | `@astrojs/check` | 0.9.12 | Astro diagnostics |
 | `@astrojs/markdown-remark` | 7.3.6 | Unified Markdown processor for the table-wrap plugin |
-| Vite | 8.3.6 | Shared by Astro 7 and the legacy build |
+| Vite | 8.3.6 | Bundler used by Astro |
 | Node | 22.23.4 | Astro 7 engine minimum |
 
-`dist-astro/` is temporary. At cutover, Astro should build directly to `dist/` and the legacy
-Vite pipeline should be removed.
+Astro now builds directly to `dist/`. The legacy Vite pipeline has been removed.
 
 ## 1. Why upgrade
 
-The current site is a hand-registered static MPA. Adding one chapter requires seven edits:
+> This section describes the pre-migration state.
+
+The site was a hand-registered static MPA. Adding one chapter required seven edits:
 
 1. create `<slug>/index.html`
 2. add an entry to `src/content/nav.ts`
@@ -530,7 +551,7 @@ Add a CI matrix that builds and link-checks both `BASE_PATH=/` and
 | **3. Content conversion** | Convert chapters to MDX one at a time, starting with `sources`, `safety`, `compare`, then widget-heavy pages | All prose in collections | **Complete** |
 | **4. Widgets** | Wrap each vanilla widget in an `.astro` component; verify keyboard, live regions, reduced motion | Feature parity | **Complete** |
 | **5. Landing/SEO** | Generate landing cards/counts; add sitemap, canonical, OG, JSON-LD; optional Pagefind search | Complete static site | **Complete** |
-| **6. Cutover** | Delete old HTML, `vite.config.ts`, `ui/chrome.ts`, unused `ui/anim.ts` pieces; update README and Copilot instructions | Clean codebase | 0.5 day |
+| **6. Cutover** | Delete old HTML, `vite.config.ts`, legacy adapters; update README and Copilot instructions | Clean codebase | **Complete** |
 
 **Total: roughly 6–8 developer-days.** Content conversion is most of the work; the framework
 migration is fast because widgets and CSS are reusable.
@@ -563,11 +584,11 @@ with content conversion as a separate, reversible step.
 7. **Rehype plugins** — auto-wrap Markdown tables in `.table-wrap`; add `rel`/`target` to external links.
 8. **Draft support** — `draft: true` excludes a chapter from nav, cards, and routes.
 9. **“Edit this page” links** — point to the MDX file on GitHub.
-10. **README cleanup** — remove the hand-maintained chapter table; link to
-    `src/content/chapters/` and document the frontmatter fields.
-11. **Update Copilot instructions** — rewrite `.github/copilot-instructions.md` and
-    `.github/instructions/docs.instructions.md` for the Astro structure: “content lives in MDX,
-    use components, never add chapter registries.”
+10. **README cleanup** — done: the README links to `src/content/chapters/` and documents the
+    frontmatter fields.
+11. **Update Copilot instructions** — done: `.github/copilot-instructions.md` and
+    `.github/instructions/mdx.instructions.md` describe the Astro structure: content lives in MDX,
+    use components, never add chapter registries.
 12. **Optional PR previews** — GitHub Pages does not support them natively; Cloudflare Pages or
     Netlify can provide preview deployments alongside GitHub Pages production.
 
@@ -588,6 +609,12 @@ The upgrade is successful when:
 
 ## 12. Next step
 
-Phases 1–5 are complete. Next is **Phase 6**: switch the GitHub Pages artifact from the legacy
-`dist/` build to Astro, remove the legacy HTML/Vite chrome, update the README and agent
-instructions for the final structure, and run the full verification suite one more time.
+The migration is complete. Astro builds `dist/` and GitHub Pages deploys that artifact.
+
+Ongoing work is ordinary maintenance:
+
+- add or edit chapters in `src/content/chapters/`
+- keep official sources and verification dates current
+- update dependencies deliberately
+- run `npm run verify` and the browser checks for interactive changes
+- optionally add Pagefind search if the content set grows

@@ -1,6 +1,6 @@
-import { getSource, sourceIndex } from '../content/sources';
-import { escapeHtml, h } from '../ui/dom';
-import { prefersReducedMotion } from '../ui/anim';
+import { getSource, sourceIndex } from '../data/sources';
+import { escapeHtml, h } from '../lib/dom';
+import { prefersReducedMotion } from '../lib/motion';
 
 interface Stage {
   label: string;

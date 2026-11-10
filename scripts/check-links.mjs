@@ -2,7 +2,7 @@
  * Internal link checker for the built site. No dependencies.
  *
  *   npm run build && npm run check:links
- *   node scripts/check-links.mjs dist-astro
+ *   node scripts/check-links.mjs dist
  *
  * Resolves relative and base-prefixed URLs against the output directory and
  * reports anything that would 404 on GitHub Pages. Pass the output directory as

@@ -14,15 +14,18 @@ If the documentation has changed, the documentation wins.
 
 ## Adding a chapter
 
-1. Add an entry to `src/content/nav.ts` with a unique `slug`, `num`, `group`, and `tone`.
-2. Add the slug to the `chapters` array in `vite.config.ts` so it becomes a build input.
-3. Create `<slug>/index.html` using an existing chapter as the template.
-4. Add any new sources to `src/content/sources.ts` **before** citing them.
-5. Finish the page with `<div data-sources="...">` listing the ids you used.
+1. Create `src/content/chapters/<slug>/index.mdx` using an existing chapter as the template.
+2. Add frontmatter: `title`, `nav`, `group`, `order`, `blurb`, `description`, `tone`, and the
+   `sources` ids you cite. See `.github/instructions/mdx.instructions.md`.
+3. Write the body as Markdown/MDX. Start with an `<h2>`; the layout renders the page header.
+4. Add any new sources to `src/data/sources.ts` **before** citing them.
+5. Run `npm run verify`.
+
+Navigation, the pager, TOC, chapter cards, and the bibliography are generated from the collection.
 
 ## Adding a source
 
-Sources live in `src/content/sources.ts`:
+Sources live in `src/data/sources.ts`:
 
 ```ts
 {
@@ -35,20 +38,22 @@ Sources live in `src/content/sources.ts`:
 }
 ```
 
-Then cite it anywhere with `<a class="cite" data-cite="short-kebab-id"></a>`.
+Then cite it in MDX with `<Cite id="short-kebab-id" />` and add the same id to the chapter's
+frontmatter `sources`.
 
 ## Style
 
 - Write for a reader who knows the product and is still confused by the terminology.
 - One idea per paragraph. Prefer concrete examples over abstract description.
-- Do not add a runtime dependency. No frameworks, fonts, analytics, or CDN links.
+- Do not add a runtime dependency. Astro is the build tool; the runtime must stay dependency-free.
+- Do not add a runtime framework or client-side router.
 - Widgets must remain keyboard operable and honour `prefers-reduced-motion`.
 
 ## Checks
 
 ```bash
-npm run build
-npm run check:links
+npm run verify
 ```
 
-Both must pass before a pull request is merged.
+This runs `astro check`, builds to `dist/`, and verifies internal links. It must pass before a pull
+request is merged.
